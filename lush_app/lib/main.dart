@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'routes.dart';
 
 void main() {
@@ -11,6 +12,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        fontFamily: 'Montserrat',
+      ),
       title: 'Lush',
       routes: routes,
     );

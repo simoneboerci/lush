@@ -101,7 +101,7 @@ class RegistrationScreen extends StatelessWidget {
                 'Completa il tuo\nprofilo per cotinuare',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: ,
+                  fontSize: 18,
                 ),
               ),
             ],
