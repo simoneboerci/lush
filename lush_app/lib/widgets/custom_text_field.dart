@@ -5,6 +5,7 @@ class CustomTextField extends StatelessWidget {
   const CustomTextField({
     super.key,
     this.padding = const EdgeInsets.all(8.0),
+    this.validator,
     this.contentPadding,
     this.controller,
     this.fillColor,
@@ -31,6 +32,7 @@ class CustomTextField extends StatelessWidget {
   const CustomTextField.large({
     super.key,
     this.padding = const EdgeInsets.symmetric(vertical: 12.0),
+    this.validator,
     this.contentPadding =
         const EdgeInsets.symmetric(horizontal: 28.0, vertical: 16.0),
     this.controller,
@@ -58,6 +60,7 @@ class CustomTextField extends StatelessWidget {
   const CustomTextField.small({
     super.key,
     this.padding = const EdgeInsets.symmetric(vertical: 12.0),
+    this.validator,
     this.contentPadding = const EdgeInsets.symmetric(horizontal: 28.0),
     this.controller,
     this.fillColor = const Color(0xFF333333),
@@ -84,6 +87,7 @@ class CustomTextField extends StatelessWidget {
   const CustomTextField.smallRounded({
     super.key,
     this.padding = const EdgeInsets.symmetric(vertical: 12.0),
+    this.validator,
     this.contentPadding = const EdgeInsets.symmetric(horizontal: 28.0),
     this.controller,
     this.fillColor = const Color(0xFF333333),
@@ -108,6 +112,7 @@ class CustomTextField extends StatelessWidget {
   });
 
   final EdgeInsets padding;
+  final String? Function(String?)? validator;
   final EdgeInsets? contentPadding;
   final TextEditingController? controller;
   final Color? fillColor;
@@ -135,6 +140,7 @@ class CustomTextField extends StatelessWidget {
     return Padding(
       padding: padding,
       child: TextFormField(
+        validator: validator,
         obscureText: obscureText,
         onChanged: onChanged,
         onEditingComplete: onEditingComplete,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lush_app/widgets/custom_form.dart';
 import 'package:lush_app/widgets/custom_text_field.dart';
 
 import 'package:provider/provider.dart';
@@ -7,7 +8,9 @@ import 'package:lush_app/constants/colors.dart';
 import 'package:lush_app/view_models/complete_registration_view_model.dart';
 
 class RegistrationScreen extends StatelessWidget {
-  const RegistrationScreen({super.key});
+  RegistrationScreen({super.key});
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -24,21 +27,22 @@ class RegistrationScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               _buildHeader(),
-              _buildForm(),
-              const SizedBox(
-                height: 16,
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: kSecondaryColor,
-                    minimumSize: const Size.fromHeight(60)),
-                onPressed: () {},
-                child: const Text(
-                  'Completa Profilo',
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
+              CustomForm(
+                formKey: _formKey,
+                textFields: [
+                  CustomTextField.large(
+                      hintText: 'Il mio nome', onChanged: (value) {}),
+                  CustomTextField.large(
+                      hintText: 'Il mio username', onChanged: (value) {}),
+                  CustomTextField.large(
+                      hintText: 'La mia email', onChanged: (value) {}),
+                  CustomTextField.large(
+                      hintText: 'La mia password', onChanged: (value) {}),
+                  CustomTextField.large(
+                      hintText: 'Conferma password', onChanged: (value) {}),
+                ],
+                buttonText: 'Completa Profilo',
+                buttonOnPressed: () {},
               ),
             ],
           ),
@@ -108,21 +112,6 @@ class RegistrationScreen extends StatelessWidget {
             ],
           ),
         )
-      ],
-    );
-  }
-
-  Widget _buildForm() {
-    return Column(
-      children: [
-        CustomTextField.large(hintText: 'Il mio nome', onChanged: (value) {}),
-        CustomTextField.large(
-            hintText: 'Il mio username', onChanged: (value) {}),
-        CustomTextField.large(hintText: 'La mia email', onChanged: (value) {}),
-        CustomTextField.large(
-            hintText: 'La mia password', onChanged: (value) {}),
-        CustomTextField.large(
-            hintText: 'Conferma password', onChanged: (value) {}),
       ],
     );
   }
