@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lush_app/widgets/custom_elevated_button.dart';
 import 'package:lush_app/widgets/custom_form.dart';
 import 'package:lush_app/widgets/custom_text_field.dart';
 
@@ -41,8 +42,11 @@ class RegistrationScreen extends StatelessWidget {
                   CustomTextField.large(
                       hintText: 'Conferma password', onChanged: (value) {}),
                 ],
-                buttonText: 'Completa Profilo',
-                buttonOnPressed: () {},
+                button: CustomElevatedButton(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  text: 'Completa Profilo',
+                  onPressed: () {},
+                ),
               ),
             ],
           ),
