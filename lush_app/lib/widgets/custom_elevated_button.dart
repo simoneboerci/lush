@@ -17,6 +17,20 @@ class CustomElevatedButton extends StatelessWidget {
     this.googleButton = false,
   });
 
+  const CustomElevatedButton.variant({
+    super.key,
+    this.padding = const EdgeInsets.all(8.0),
+    this.backgroundColor = kAccentColor,
+    this.minimumSize = const Size.fromHeight(60.0),
+    this.onPressed,
+    this.text = '',
+    this.textColor = const Color(0xFF121212),
+    this.fontWeight = FontWeight.bold,
+    this.fontSize = 18.0,
+    this.fontFamily = 'Playfair Display',
+    this.googleButton = false,
+  });
+
   const CustomElevatedButton.google({
     super.key,
     this.padding = const EdgeInsets.all(8.0),
