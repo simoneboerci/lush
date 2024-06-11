@@ -96,7 +96,7 @@ class RegistrationScreen extends StatelessWidget {
                   CustomIconButton.large(
                     icon: Icons.add,
                     onPressed: () {},
-                  ),
+                  )
                 ],
               ),
               const Text(

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 const AssetImage kArrowImage = AssetImage('assets/images/arrow.png');
 
+const AssetImage kGoogleIconImage = AssetImage('assets/images/google_icon.png');
+
 const AssetImage kLightPinkLogo =
     AssetImage('assets/images/light_pink_logo.png');
 const AssetImage kLightLightBlueLogo =
