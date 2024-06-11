@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lush_app/widgets/custom_elevated_button.dart';
 import 'package:lush_app/widgets/custom_form.dart';
+import 'package:lush_app/widgets/custom_icon_button.dart';
 import 'package:lush_app/widgets/custom_text_field.dart';
 
 import 'package:provider/provider.dart';
@@ -92,17 +93,9 @@ class RegistrationScreen extends StatelessWidget {
                   const SizedBox(
                     width: 66.0,
                   ),
-                  Container(
-                    decoration: BoxDecoration(
-                        color: Colors.white10,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: kAccentColor, width: 1)),
-                    child: IconButton(
-                      onPressed: () {},
-                      color: Colors.white,
-                      icon: const Icon(Icons.add),
-                      padding: const EdgeInsets.all(28),
-                    ),
+                  CustomIconButton.large(
+                    icon: Icons.add,
+                    onPressed: () {},
                   ),
                 ],
               ),
