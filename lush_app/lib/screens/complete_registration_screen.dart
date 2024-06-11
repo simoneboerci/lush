@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lush_app/widgets/custom_text_field.dart';
 
 import 'package:provider/provider.dart';
 
@@ -114,48 +115,15 @@ class RegistrationScreen extends StatelessWidget {
   Widget _buildForm() {
     return Column(
       children: [
-        _buildFormField(label: 'Il mio nome', onChanged: (value) {}),
-        _buildFormField(label: 'Il mio username', onChanged: (value) {}),
-        _buildFormField(label: 'La mia email', onChanged: (value) {}),
-        _buildFormField(label: 'La mia password', onChanged: (value) {}),
-        _buildFormField(label: 'Conferma password', onChanged: (value) {}),
+        CustomTextField.large(hintText: 'Il mio nome', onChanged: (value) {}),
+        CustomTextField.large(
+            hintText: 'Il mio username', onChanged: (value) {}),
+        CustomTextField.large(hintText: 'La mia email', onChanged: (value) {}),
+        CustomTextField.large(
+            hintText: 'La mia password', onChanged: (value) {}),
+        CustomTextField.large(
+            hintText: 'Conferma password', onChanged: (value) {}),
       ],
-    );
-  }
-
-  Widget _buildFormField({
-    required String label,
-    bool obscureText = false,
-    required Function(String) onChanged,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: TextField(
-        obscureText: obscureText,
-        onChanged: onChanged,
-        cursorColor: kAccentColor,
-        cursorHeight: 16,
-        style: const TextStyle(
-          height: 2,
-          color: Colors.white,
-        ),
-        cursorErrorColor: kSecondaryColor,
-        decoration: InputDecoration(
-          hintStyle: const TextStyle(
-            color: Colors.white30,
-          ),
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
-          focusColor: kAccentColor,
-          fillColor: const Color(0xFF333333),
-          hintText: label,
-          filled: true,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide.none,
-          ),
-        ),
-      ),
     );
   }
 }
