@@ -22,7 +22,7 @@ class CustomIconButton extends StatelessWidget {
     required this.icon,
     this.iconMargin = const EdgeInsets.all(28.0),
     this.backgroundColor = const Color(0xFF333333),
-    this.borderColor = kAccentColor,
+    this.borderColor = cSecondaryColor,
   });
 
   const CustomIconButton.small({

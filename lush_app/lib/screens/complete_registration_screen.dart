@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:lush_app/widgets/custom_elevated_button.dart';
-import 'package:lush_app/widgets/custom_form.dart';
-import 'package:lush_app/widgets/custom_icon_button.dart';
-import 'package:lush_app/widgets/custom_text_field.dart';
 
 import 'package:provider/provider.dart';
 
 import 'package:lush_app/constants/colors.dart';
-import 'package:lush_app/view_models/complete_registration_view_model.dart';
+import 'package:lush_app/constants/images.dart';
+
+import 'package:lush_app/models/complete_registration_view_model.dart';
+
+import 'package:lush_app/widgets/custom_elevated_button.dart';
+import 'package:lush_app/widgets/custom_form.dart';
+import 'package:lush_app/widgets/custom_icon_button.dart';
+import 'package:lush_app/widgets/custom_text_field.dart';
 
 class RegistrationScreen extends StatelessWidget {
   RegistrationScreen({super.key});
@@ -74,7 +77,7 @@ class RegistrationScreen extends StatelessWidget {
             ),
             Image(
               width: 50,
-              image: kArrowImage,
+              image: cArrowImage,
             ),
           ],
         ),
@@ -87,7 +90,7 @@ class RegistrationScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   const Image(
-                    image: kLightPinkLogo,
+                    image: cLightPinkLogo,
                     height: 50.0,
                   ),
                   const SizedBox(

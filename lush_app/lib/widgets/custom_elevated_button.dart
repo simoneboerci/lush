@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
 import 'package:lush_app/constants/colors.dart';
+import 'package:lush_app/constants/images.dart';
 
 class CustomElevatedButton extends StatelessWidget {
   const CustomElevatedButton({
     super.key,
     this.padding = const EdgeInsets.all(8.0),
-    this.backgroundColor = kSecondaryColor,
+    this.backgroundColor = cPrimaryColor,
     this.minimumSize = const Size.fromHeight(60.0),
     this.onPressed,
     this.text = '',
@@ -20,7 +21,7 @@ class CustomElevatedButton extends StatelessWidget {
   const CustomElevatedButton.variant({
     super.key,
     this.padding = const EdgeInsets.all(8.0),
-    this.backgroundColor = kAccentColor,
+    this.backgroundColor = cSecondaryColor,
     this.minimumSize = const Size.fromHeight(60.0),
     this.onPressed,
     this.text = '',
@@ -72,7 +73,7 @@ class CustomElevatedButton extends StatelessWidget {
             googleButton
                 ? const Image(
                     width: 28.0,
-                    image: kGoogleIconImage,
+                    image: cGoogleIconImage,
                   )
                 : Container(),
             Text(

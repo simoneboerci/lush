@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:lush_app/constants/colors.dart';
 
 class CustomTextField extends StatelessWidget {
@@ -37,8 +38,8 @@ class CustomTextField extends StatelessWidget {
         const EdgeInsets.symmetric(horizontal: 28.0, vertical: 16.0),
     this.controller,
     this.fillColor = const Color(0xFF333333),
-    this.cursorColor = kAccentColor,
-    this.cursorErrorColor = kSecondaryColor,
+    this.cursorColor = cSecondaryColor,
+    this.cursorErrorColor = cSecondaryColor,
     this.cursorHeight = 16.0,
     this.filled = true,
     this.borderRadius = 16.0,
@@ -64,8 +65,8 @@ class CustomTextField extends StatelessWidget {
     this.contentPadding = const EdgeInsets.symmetric(horizontal: 28.0),
     this.controller,
     this.fillColor = const Color(0xFF333333),
-    this.cursorColor = kAccentColor,
-    this.cursorErrorColor = kSecondaryColor,
+    this.cursorColor = cSecondaryColor,
+    this.cursorErrorColor = cSecondaryColor,
     this.cursorHeight,
     this.filled = true,
     this.borderRadius = 16.0,
@@ -91,8 +92,8 @@ class CustomTextField extends StatelessWidget {
     this.contentPadding = const EdgeInsets.symmetric(horizontal: 28.0),
     this.controller,
     this.fillColor = const Color(0xFF333333),
-    this.cursorColor = kAccentColor,
-    this.cursorErrorColor = kSecondaryColor,
+    this.cursorColor = cSecondaryColor,
+    this.cursorErrorColor = cSecondaryColor,
     this.cursorHeight,
     this.filled = true,
     this.borderRadius = 100.0,
