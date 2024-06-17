@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:lush_app/constants/images.dart';
 
 import 'package:lush_app/widgets/custom_background.dart';
+import 'package:lush_app/widgets/custom_date_text_field.dart';
 import 'package:lush_app/widgets/custom_elevated_button.dart';
 import 'package:lush_app/widgets/custom_form.dart';
 import 'package:lush_app/widgets/custom_text_field.dart';
@@ -26,6 +27,13 @@ class FirstStepVerificationScreen extends StatelessWidget {
               image: cLightLightBlueLogo,
               text: 'Compila il form\nper verificare il tuo profilo',
             ),
+          ),
+          CustomDateTextField(
+            controller: TextEditingController(),
+            firstDate: DateTime(1900),
+            lastDate: DateTime.now(),
+            initialDate: DateTime.now(),
+            hintText: 'La mia data di nascita',
           ),
           CustomForm(
             formKey: _formKey,
