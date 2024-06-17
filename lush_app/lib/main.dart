@@ -18,8 +18,8 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   @override
-  void initState() async {
-    await initFirebase();
+  void initState() {
+    initFirebase();
     super.initState();
   }
 

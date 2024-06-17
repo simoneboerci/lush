@@ -12,6 +12,13 @@ class RegistrationScreen extends StatelessWidget {
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _passowrdConfirmationController =
+      TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     String password = '';
@@ -29,6 +36,7 @@ class RegistrationScreen extends StatelessWidget {
             textFields: [
               CustomTextField.large(
                 hintText: 'Il mio nome',
+                controller: _nameController,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Per favore, inserisci il tuo nome';
@@ -38,6 +46,7 @@ class RegistrationScreen extends StatelessWidget {
               ),
               CustomTextField.large(
                 hintText: 'Il mio username',
+                controller: _usernameController,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Per favore, inserisci il tuo username';
@@ -47,6 +56,7 @@ class RegistrationScreen extends StatelessWidget {
               ),
               CustomTextField.large(
                 hintText: 'La mia email',
+                controller: _emailController,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Per favore, inserisci la tua email';
@@ -56,6 +66,7 @@ class RegistrationScreen extends StatelessWidget {
               ),
               CustomTextField.large(
                 hintText: 'La mia password',
+                controller: _passwordController,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Per favore, inserisci la tua password';
@@ -67,6 +78,7 @@ class RegistrationScreen extends StatelessWidget {
               ),
               CustomTextField.large(
                 hintText: 'Conferma password',
+                controller: _passowrdConfirmationController,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Per favore, conferma la tua password';
