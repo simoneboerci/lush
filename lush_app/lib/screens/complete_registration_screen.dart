@@ -1,160 +1,95 @@
 import 'package:flutter/material.dart';
 
-import 'package:provider/provider.dart';
+import 'package:lush_app/widgets/registration_header.dart';
 
-import 'package:lush_app/constants/colors.dart';
-import 'package:lush_app/view_models/complete_registration_view_model.dart';
+import 'package:lush_app/widgets/custom_background.dart';
+import 'package:lush_app/widgets/custom_elevated_button.dart';
+import 'package:lush_app/widgets/custom_form.dart';
+import 'package:lush_app/widgets/custom_text_field.dart';
 
 class RegistrationScreen extends StatelessWidget {
-  const RegistrationScreen({super.key});
+  RegistrationScreen({super.key});
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => RegistrationViewModel(),
-      child: Scaffold(
-        body: Container(
-          decoration: const BoxDecoration(
-            gradient: kBackgroundGradient,
+    String password = '';
+
+    return CustomBackground(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const RegistrationHeader(
+            showButton: true,
           ),
-          padding: const EdgeInsets.all(28),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              _buildHeader(),
-              _buildForm(),
-              const SizedBox(
-                height: 16,
+          CustomForm(
+            formKey: _formKey,
+            textFields: [
+              CustomTextField.large(
+                hintText: 'Il mio nome',
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Per favore, inserisci il tuo nome';
+                  }
+                  return null;
+                },
               ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: kSecondaryColor,
-                    minimumSize: const Size.fromHeight(60)),
-                onPressed: () {},
-                child: const Text(
-                  'Completa Profilo',
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
+              CustomTextField.large(
+                hintText: 'Il mio username',
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Per favore, inserisci il tuo username';
+                  }
+                  return null;
+                },
+              ),
+              CustomTextField.large(
+                hintText: 'La mia email',
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Per favore, inserisci la tua email';
+                  }
+                  return null;
+                },
+              ),
+              CustomTextField.large(
+                hintText: 'La mia password',
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Per favore, inserisci la tua password';
+                  } else {
+                    password = value;
+                  }
+                  return null;
+                },
+              ),
+              CustomTextField.large(
+                hintText: 'Conferma password',
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Per favore, conferma la tua password';
+                  }
+                  if (value != password) {
+                    return 'Le password non corrispondono';
+                  }
+                  return null;
+                },
               ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Column(
-      children: [
-        const Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              'Clicca qui per inserire\nla tua immagine profilo',
-              style: TextStyle(
-                color: Colors.white,
-              ),
+            button: CustomElevatedButton(
+              padding: const EdgeInsets.only(top: 16.0),
+              text: 'Completa Profilo',
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  Navigator.pushNamed(
+                      context, '/first_step_verification_screen');
+                }
+              },
             ),
-            SizedBox(
-              width: 8,
-            ),
-            Image(
-              width: 50,
-              image: kArrowImage,
-            ),
-          ],
-        ),
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  const Image(
-                    image: kLightPinkLogo,
-                    height: 50.0,
-                  ),
-                  const SizedBox(
-                    width: 66.0,
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                        color: Colors.white10,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: kAccentColor, width: 1)),
-                    child: IconButton(
-                      onPressed: () {},
-                      color: Colors.white,
-                      icon: const Icon(Icons.add),
-                      padding: const EdgeInsets.all(28),
-                    ),
-                  ),
-                ],
-              ),
-              const Text(
-                'Completa il tuo\nprofilo per cotinuare',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                ),
-              ),
-            ],
           ),
-        )
-      ],
-    );
-  }
-
-  Widget _buildForm() {
-    return Column(
-      children: [
-        _buildFormField(label: 'Il mio nome', onChanged: (value) {}),
-        _buildFormField(label: 'Il mio username', onChanged: (value) {}),
-        _buildFormField(label: 'La mia email', onChanged: (value) {}),
-        _buildFormField(label: 'La mia password', onChanged: (value) {}),
-        _buildFormField(label: 'Conferma password', onChanged: (value) {}),
-      ],
-    );
-  }
-
-  Widget _buildFormField({
-    required String label,
-    bool obscureText = false,
-    required Function(String) onChanged,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: TextField(
-        obscureText: obscureText,
-        onChanged: onChanged,
-        cursorColor: kAccentColor,
-        cursorHeight: 16,
-        style: const TextStyle(
-          height: 2,
-          color: Colors.white,
-        ),
-        cursorErrorColor: kSecondaryColor,
-        decoration: InputDecoration(
-          hintStyle: const TextStyle(
-            color: Colors.white30,
-          ),
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
-          focusColor: kAccentColor,
-          fillColor: const Color(0xFF333333),
-          hintText: label,
-          filled: true,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide.none,
-          ),
-        ),
+        ],
       ),
     );
   }
