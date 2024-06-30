@@ -31,11 +31,7 @@ class FastRegistrationScreen extends StatelessWidget {
   Future<LushUser?> _loginWithGoogle() async {
     LushUser? loggedUser = await FirebaseHelper.loginWithGoogle();
 
-    if (loggedUser != null) {
-      return await FirebaseHelper.getUserWithUid(loggedUser.userId);
-    }
-
-    return null;
+    return await FirebaseHelper.getUserWithUid(loggedUser!.userId);
   }
 
   void _onGoogleButtonPressed(BuildContext context) {

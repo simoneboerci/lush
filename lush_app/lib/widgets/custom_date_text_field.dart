@@ -52,11 +52,9 @@ class _CustomDateTextFieldState extends State<CustomDateTextField> {
         },
       );
 
-      if (pickedDate != null) {
-        setState(() {
-          widget.controller.text = DateFormat('dd/MM/yyyy').format(pickedDate);
-        });
-      }
+      setState(() {
+        widget.controller.text = DateFormat('dd/MM/yyyy').format(pickedDate!);
+      });
     }
 
     return CustomTextField.large(
