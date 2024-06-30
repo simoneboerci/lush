@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:intl/intl.dart';
+import 'package:lush_app/widgets/custom_date_text_field.dart';
+import 'package:lush_app/widgets/custom_google_places_text_field.dart';
 import 'package:provider/provider.dart';
 
 import 'package:lush_app/constants/images.dart';
@@ -98,13 +100,22 @@ class FirstStepVerificationScreen extends StatelessWidget {
                 hintText: 'Il mio cognome',
                 controller: _surnameController,
               ),
-              CustomTextField.large(
-                hintText: 'La mia data di nascita',
+              CustomDateTextField(
                 controller: _birthDateController,
+                firstDate: DateTime(1900),
+                lastDate: DateTime.now(),
+                initialDate: DateTime.now(),
               ),
-              CustomTextField.large(
-                hintText: 'Il mio luogo di nascita',
+              CustomGooglePlacesTextField(
                 controller: _birthLocationController,
+                itemClick: (prediction) {
+                  _birthLocationController.text = prediction.description!;
+                  _birthLocationController.selection =
+                      TextSelection.fromPosition(
+                    TextPosition(offset: prediction.description!.length),
+                  );
+                },
+                hintText: 'Il mio indirizzo di residenza',
               ),
             ],
             button: CustomElevatedButton.variant(
