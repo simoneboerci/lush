@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:lush_app/constants/colors.dart';
 import 'package:lush_app/widgets/custom_elevated_button.dart';
 
 import 'package:lush_app/widgets/custom_text_field.dart';
