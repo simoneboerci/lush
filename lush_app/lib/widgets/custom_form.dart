@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:lush_app/constants/colors.dart';
 import 'package:lush_app/widgets/custom_elevated_button.dart';
-
-import 'package:lush_app/widgets/custom_text_field.dart';
 
 class CustomForm extends StatelessWidget {
   const CustomForm({
@@ -16,7 +13,7 @@ class CustomForm extends StatelessWidget {
 
   final EdgeInsets padding;
   final GlobalKey<FormState> formKey;
-  final List<CustomTextField> textFields;
+  final List<Widget> textFields;
   final CustomElevatedButton button;
 
   @override

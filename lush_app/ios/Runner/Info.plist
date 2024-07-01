@@ -45,5 +45,15 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>GIDClientID</key>
+	<string>486068714741-nvqran7ehi2cmjb12181e6b8091dil6g.apps.googleusercontent.com</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Richiede l'accesso alla tua posizione per fornire suggerimenti di indirizzo.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Richiede l'accesso alla tua posizione per fornire suggerimenti di indirizzo.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Richiede l'accesso alla tua posizione per fornire suggerimenti di indirizzo.</string>
+	<key>io.flutter.embedded_views_preview</key>
+	<true/>
 </dict>
 </plist>
