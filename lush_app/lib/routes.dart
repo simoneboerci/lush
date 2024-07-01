@@ -4,6 +4,7 @@ import 'package:lush_app/screens/fast_registration_screen.dart';
 import 'package:lush_app/screens/first_step_verification_screen.dart';
 import 'package:lush_app/screens/login_screen.dart';
 import 'package:lush_app/screens/second_step_verification_screen.dart';
+import 'package:lush_app/screens/shop_screen.dart';
 import 'package:lush_app/screens/third_step_verification_screen.dart';
 import 'package:lush_app/screens/verification_completed_screen.dart';
 import 'screens/complete_registration_screen.dart';
@@ -19,4 +20,5 @@ Map<String, WidgetBuilder> routes = {
   '/verification_completed_screen': (context) =>
       const VerificationCompletedScreen(),
   '/login_screen': (context) => LoginScreen(),
+  '/shop_screen': (context) => const ShopScreen(),
 };

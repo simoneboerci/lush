@@ -3,18 +3,25 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:lush_app/firebase_options.dart';
+import 'package:lush_app/models/lush_credits_offer.dart';
 
 import 'package:lush_app/models/lush_user.dart';
 
 class FirebaseHelper {
   static const String firebaseUserCollectionLabel = 'users';
+  static const String firebaseOffersCollectionLabel = 'offers';
 
   static String getCurrentUserUid = FirebaseAuth.instance.currentUser!.uid;
 
-  static Future<void> initFirebase() async {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+  static bool _isInitialized = false;
+
+  static Future<void> ensureInitialized() async {
+    if (!_isInitialized) {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+      _isInitialized = true;
+    }
   }
 
   static Future<LushUser?> getUserWithUid(String uid) async {
@@ -118,5 +125,18 @@ class FirebaseHelper {
     } catch (e) {
       print('Errore durante il salvataggio dei dati utente nel database: $e');
     }
+  }
+
+  static Stream<List<LushCreditsOffer>> getCreditsOffersStream() async* {
+    await ensureInitialized();
+
+    yield* FirebaseFirestore.instance
+        .collection(firebaseOffersCollectionLabel)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return LushCreditsOffer.fromMap(doc.data()..['id'] = doc.id);
+      }).toList();
+    });
   }
 }
