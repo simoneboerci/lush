@@ -53,7 +53,9 @@ class _CustomDateTextFieldState extends State<CustomDateTextField> {
       );
 
       setState(() {
-        widget.controller.text = DateFormat('dd/MM/yyyy').format(pickedDate!);
+        if (widget.controller.text.isEmpty) {
+          widget.controller.text = DateFormat('dd/MM/yyyy').format(pickedDate!);
+        }
       });
     }
 

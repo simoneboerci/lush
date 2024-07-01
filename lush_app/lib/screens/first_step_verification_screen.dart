@@ -26,8 +26,7 @@ class FirstStepVerificationScreen extends StatelessWidget {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _surnameController = TextEditingController();
   final TextEditingController _birthDateController = TextEditingController();
-  final TextEditingController _birthLocationController =
-      TextEditingController();
+  final TextEditingController _birthAddressController = TextEditingController();
 
   Future<LushUser?> _confirmFirstStepVerification(LushUser loggedUser) async {
     if (_formKey.currentState!.validate()) {
@@ -36,11 +35,13 @@ class FirstStepVerificationScreen extends StatelessWidget {
           user: loggedUser,
           name: _nameController.text,
           surname: _surnameController.text,
-          birthDate: DateFormat('dd-MM-yyyy').parse(_birthDateController.text),
-          birthLocation: _birthLocationController.text,
+          birthDate: DateFormat('dd/MM/yyyy').parse(_birthDateController.text),
+          birthAddress: _birthAddressController.text,
         );
 
         await FirebaseHelper.storeUserData(updatedUser);
+
+        return updatedUser;
       } catch (e) {
         print('Errore durante il primo step di verifica: $e');
       }
@@ -54,7 +55,7 @@ class FirstStepVerificationScreen extends StatelessWidget {
             Provider.of<UserProvider>(context, listen: false).user!)
         .then((user) {
       if (user != null) {
-        Provider.of<UserProvider>(context).setUser(user);
+        Provider.of<UserProvider>(context, listen: false).setUser(user);
         Navigator.pushReplacementNamed(
             context, '/second_step_verification_screen');
       }
@@ -68,8 +69,9 @@ class FirstStepVerificationScreen extends StatelessWidget {
     if (currentUser != null) {
       _nameController.text = currentUser.name ?? '';
       _surnameController.text = currentUser.surname ?? '';
-      _birthDateController.text = currentUser.birthDate.toString();
-      _birthLocationController.text = currentUser.birthLocation ?? '';
+      _birthDateController.text =
+          DateFormat('dd/MM/yyyy').format(currentUser.birthDate!);
+      _birthAddressController.text = currentUser.birthAddress ?? '';
     }
   }
 
@@ -101,21 +103,22 @@ class FirstStepVerificationScreen extends StatelessWidget {
                 controller: _surnameController,
               ),
               CustomDateTextField(
+                hintText: 'La mia data di nascita',
                 controller: _birthDateController,
                 firstDate: DateTime(1900),
                 lastDate: DateTime.now(),
                 initialDate: DateTime.now(),
               ),
               CustomGooglePlacesTextField(
-                controller: _birthLocationController,
+                controller: _birthAddressController,
                 itemClick: (prediction) {
-                  _birthLocationController.text = prediction.description!;
-                  _birthLocationController.selection =
+                  _birthAddressController.text = prediction.description!;
+                  _birthAddressController.selection =
                       TextSelection.fromPosition(
                     TextPosition(offset: prediction.description!.length),
                   );
                 },
-                hintText: 'Il mio indirizzo di residenza',
+                hintText: 'Il mio indirizzo di nascita',
               ),
             ],
             button: CustomElevatedButton.variant(
