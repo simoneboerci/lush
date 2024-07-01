@@ -56,8 +56,20 @@ class SecondStepVerificationScreen extends StatelessWidget {
     });
   }
 
+  void _updateTextFieldTextsBasedOnUser(BuildContext context) {
+    LushUser? currentUser =
+        Provider.of<UserProvider>(context, listen: false).user;
+
+    if (currentUser != null) {
+      _residenceAddressController.text = currentUser.residenceAddress ?? '';
+      _emailController.text = currentUser.email ?? '';
+      _phoneNumberController.text = currentUser.phoneNumber ?? '';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    _updateTextFieldTextsBasedOnUser(context);
     return CustomBackground(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

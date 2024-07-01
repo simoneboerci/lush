@@ -35,6 +35,7 @@ class CustomGooglePlacesTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomTextField.large(
       controller: controller,
+      hintText: hintText,
       onTap: () {
         _showPlacesAutocomplete(context);
         onTap;

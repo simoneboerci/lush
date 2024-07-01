@@ -52,7 +52,6 @@ class FirebaseHelper {
     try {
       final UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
-
       return LushUser(
           userId: userCredential.user!.uid, email: email, password: password);
     } catch (e) {
@@ -67,6 +66,8 @@ class FirebaseHelper {
     try {
       final UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
+
+      await FirebaseAuth.instance.currentUser!.sendEmailVerification();
 
       return LushUser(
           userId: userCredential.user!.uid, email: email, password: password);

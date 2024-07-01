@@ -5,6 +5,7 @@ class LushUser {
 
   String? name;
   String? surname;
+  String? fiscalCode;
   DateTime? birthDate;
   String? birthAddress;
   String? residenceAddress;
@@ -19,6 +20,7 @@ class LushUser {
     this.username,
     this.name,
     this.surname,
+    this.fiscalCode,
     this.birthDate,
     this.birthAddress,
     this.residenceAddress,
@@ -31,6 +33,7 @@ class LushUser {
     required LushUser user,
     String? name,
     String? surname,
+    String? fiscalCode,
     DateTime? birthDate,
     String? birthAddress,
     String? residenceAddress,
@@ -43,6 +46,7 @@ class LushUser {
       userId: user.userId,
       name: name ?? user.name,
       surname: surname ?? user.surname,
+      fiscalCode: fiscalCode ?? user.fiscalCode,
       birthDate: birthDate ?? user.birthDate,
       birthAddress: birthAddress ?? user.birthAddress,
       username: username ?? user.username,
@@ -60,6 +64,7 @@ class LushUser {
       username: map['username'],
       name: map['name'],
       surname: map['surname'],
+      fiscalCode: map['fiscal_code'],
       email: map['email'],
       password: map['password'],
       birthDate: birthDate.toDate(),
@@ -75,6 +80,7 @@ class LushUser {
       'username': username,
       'name': name,
       'surname': surname,
+      'fiscal_code': fiscalCode,
       'birth_date': birthDate,
       'birth_address': birthAddress,
       'residence_address': residenceAddress,
