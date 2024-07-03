@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:lush_app/screens/direct_screen.dart';
 import 'package:lush_app/screens/fast_registration_screen.dart';
 import 'package:lush_app/screens/first_step_verification_screen.dart';
 import 'package:lush_app/screens/login_screen.dart';
@@ -10,7 +11,7 @@ import 'package:lush_app/screens/verification_completed_screen.dart';
 import 'screens/complete_registration_screen.dart';
 
 Map<String, WidgetBuilder> routes = {
-  '/': (context) => LoginScreen(),
+  '/': (context) => DirectScreen(),
   '/fast_registration_screen': (context) => FastRegistrationScreen(),
   '/complete_registration_screen': (context) => RegistrationScreen(),
   '/first_step_verification_screen': (context) => FirstStepVerificationScreen(),

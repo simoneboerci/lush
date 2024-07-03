@@ -1,0 +1,202 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+
+import 'package:lush_app/constants/colors.dart';
+import 'package:lush_app/constants/images.dart';
+import 'package:lush_app/models/direct_message.dart';
+
+import 'package:lush_app/widgets/custom_background.dart';
+import 'package:lush_app/widgets/lush_tokens_widget.dart';
+import 'package:lush_app/widgets/message_bubble_widget.dart';
+import 'package:lush_app/widgets/send_message_widget.dart';
+
+class DirectScreen extends StatelessWidget {
+  DirectScreen({super.key});
+
+  final TextEditingController _messageController = TextEditingController();
+
+  Widget _buildAppBar() {
+    return const Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: 28.0,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'Direct',
+            style: TextStyle(
+              fontSize: 18.0,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              fontFamily: 'PLayfair Display',
+            ),
+          ),
+          LushTokensWidget(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContactBar() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 28.0, horizontal: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  backgroundColor: Colors.transparent,
+                ),
+                onPressed: () {},
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.arrow_back_ios,
+                      color: cSecondaryColor,
+                    ),
+                    Text(
+                      '28',
+                      style: TextStyle(
+                        color: cSecondaryColor,
+                        fontSize: 16.0,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                width: 8.0,
+              ),
+              const Row(
+                children: [
+                  CircleAvatar(
+                    backgroundImage: cLushTokenIcon,
+                  ),
+                  SizedBox(
+                    width: 8.0,
+                  ),
+                  Column(
+                    children: [
+                      Text(
+                        'Username_88',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'Attivo/a 2h fa',
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(
+                onPressed: () {},
+                color: cSecondaryColor,
+                icon: const Icon(
+                  Icons.phone_outlined,
+                  size: 30.0,
+                ),
+              ),
+              IconButton(
+                onPressed: () {},
+                color: cSecondaryColor,
+                icon: const Icon(
+                  Icons.video_call_outlined,
+                  size: 40.0,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final List<DirectMessage> messages = [
+      DirectMessage(
+          text: 'Quando vuoi', sender: '', timestamp: Timestamp.now()),
+      DirectMessage(
+          text: 'Domani per che ora sei libera?',
+          sender: 'Me',
+          timestamp: Timestamp.now()),
+      DirectMessage(
+          text:
+              'Domani possiamo fare verso sera. Esco dal lavoro alle 18:00, va bene?',
+          sender: '',
+          timestamp: Timestamp.now()),
+      DirectMessage(
+          text: 'Altrimenti mercoledì alle 14:00, dimmi tu',
+          sender: '',
+          timestamp: Timestamp.now()),
+      DirectMessage(
+          text: 'Ottimo per domani alle 18:00',
+          sender: 'Me',
+          timestamp: Timestamp.now()),
+      DirectMessage(
+          text: 'Perfetto :)', sender: '', timestamp: Timestamp.now()),
+      DirectMessage(
+          text: 'Un piccolo regalo per te',
+          sender: '',
+          timestamp: Timestamp.now()),
+    ];
+
+    return CustomBackground(
+      padding: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 50.0),
+        child: Column(
+          children: [
+            _buildAppBar(),
+            _buildContactBar(),
+            Expanded(
+              child: ListView.builder(
+                itemCount: messages.length,
+                itemBuilder: (context, index) {
+                  final message = messages[messages.length - 1 - index];
+                  String previousMessageSender = 'None';
+                  try {
+                    previousMessageSender =
+                        messages[messages.length - 1 - index - 1].sender;
+                  } catch (_) {}
+                  EdgeInsets padding = message.sender != previousMessageSender
+                      ? const EdgeInsets.only(bottom: 8.0)
+                      : EdgeInsets.zero;
+                  return Padding(
+                    padding: padding,
+                    child: MessageBubbleWidget(
+                        message: message, isMe: message.sender == 'Me'),
+                  );
+                },
+              ),
+            ),
+            SendMessageWidget(
+              controller: _messageController,
+              onMessageSent: (message) {
+                messages.add(DirectMessage(
+                    text: message, sender: 'Me', timestamp: Timestamp.now()));
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

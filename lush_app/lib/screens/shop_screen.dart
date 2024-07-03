@@ -87,9 +87,7 @@ class ShopScreen extends StatelessWidget {
                 ),
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 28.0),
-                  child: LushTokensWidget(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                  ),
+                  child: LushTokensWidget.large(),
                 ),
                 ...creativeOffers.map((offer) => CreditsOfferWidget.creative(
                       offer: offer,
