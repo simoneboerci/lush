@@ -10,7 +10,7 @@ import 'package:lush_app/screens/verification_completed_screen.dart';
 import 'screens/complete_registration_screen.dart';
 
 Map<String, WidgetBuilder> routes = {
-  '/': (context) => FastRegistrationScreen(),
+  '/': (context) => LoginScreen(),
   '/fast_registration_screen': (context) => FastRegistrationScreen(),
   '/complete_registration_screen': (context) => RegistrationScreen(),
   '/first_step_verification_screen': (context) => FirstStepVerificationScreen(),

@@ -14,6 +14,7 @@ class LushCreditsOffer {
   final double fullPrice;
   final double? discountedPrice;
   final CreditsOfferType offerType;
+  final int offerAmount;
 
   LushCreditsOffer({
     required this.id,
@@ -23,11 +24,12 @@ class LushCreditsOffer {
     this.fullPrice = 0.0,
     this.discountedPrice,
     required this.offerType,
+    required this.offerAmount,
   });
 
   factory LushCreditsOffer.fromMap(Map<String, dynamic> map) {
     return LushCreditsOffer(
-      id: map['id'] ?? '',
+      id: map['offer_id'] ?? '',
       label: map['label'] ?? '',
       startDate: (map['start_date'] as Timestamp).toDate(),
       endDate: map['end_date'] != null
@@ -38,6 +40,7 @@ class LushCreditsOffer {
           ? (map['discounted_price'] as num).toDouble()
           : null,
       offerType: _parseOfferType(map['offer_type']),
+      offerAmount: (map['offer_amount'] as num).toInt(),
     );
   }
 
@@ -50,7 +53,7 @@ class LushCreditsOffer {
       case 'basic':
         return CreditsOfferType.basic;
       default:
-        return CreditsOfferType.basic; // o gestisci diversamente
+        return CreditsOfferType.basic;
     }
   }
 }

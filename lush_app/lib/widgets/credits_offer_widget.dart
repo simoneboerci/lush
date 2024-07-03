@@ -25,9 +25,33 @@ class CreditsOfferWidget extends StatelessWidget {
     this.imageSize = 27.0,
     this.image = cPinkTongue,
     this.offerType = CreditsOfferType.magic,
+    this.disabledBackgroundColor = cSurfaceColor,
   });
 
   const CreditsOfferWidget.creative({
+    super.key,
+    required this.offer,
+    this.padding = const EdgeInsets.symmetric(vertical: 16.0),
+    this.onPressed,
+    this.backgroundColor = cSurfaceColor,
+    this.labelTextColor = Colors.white,
+    this.timerTextColor = cSecondaryColor,
+    this.fullPriceTextColor = Colors.white,
+    this.discountedPriceTextColor = Colors.white,
+    this.currencyLabelTextColor = Colors.white,
+    this.borderRadius = 16.0,
+    this.contentPadding =
+        const EdgeInsets.only(left: 28.0, top: 16.0, bottom: 16.0),
+    this.labelFontSize = 18.0,
+    this.timerFontSize = 16.0,
+    this.priceFontSize = 24.0,
+    this.imageSize = 27.0,
+    this.image = cPinkTongue,
+    this.offerType = CreditsOfferType.creative,
+    this.disabledBackgroundColor,
+  });
+
+  const CreditsOfferWidget.basic({
     super.key,
     required this.offer,
     this.padding = const EdgeInsets.symmetric(vertical: 16.0),
@@ -46,7 +70,8 @@ class CreditsOfferWidget extends StatelessWidget {
     this.priceFontSize = 24.0,
     this.imageSize = 27.0,
     this.image = cPinkTongue,
-    this.offerType = CreditsOfferType.creative,
+    this.offerType = CreditsOfferType.basic,
+    this.disabledBackgroundColor,
   });
 
   final LushCreditsOffer offer;
@@ -66,6 +91,7 @@ class CreditsOfferWidget extends StatelessWidget {
   final double imageSize;
   final AssetImage image;
   final CreditsOfferType offerType;
+  final Color? disabledBackgroundColor;
 
   String _getPriceString() {
     if (offer.discountedPrice == null ||
@@ -84,65 +110,126 @@ class CreditsOfferWidget extends StatelessWidget {
     }
   }
 
-  Widget _buildSelectedOfferBasedOnType() {
+  Widget _buildSelectedOfferBasedOnType(BuildContext context) {
     switch (offerType) {
       case CreditsOfferType.magic:
         return _buildMagicOfferWidget();
       case CreditsOfferType.creative:
         return _buildCreativeOfferWidget();
       case CreditsOfferType.basic:
-        break;
+        return _buildBasicOfferWidget(context);
     }
-
-    return Container();
   }
 
-  Widget _buildCreativeOfferWidget() {
+  Widget _buildBasicOfferWidget(BuildContext context) {
     return SizedBox(
-      width: double.infinity,
+      height: 280.0,
+      width: MediaQuery.sizeOf(context).width / 2.0 - 36.0,
       child: ElevatedButton(
+        onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: cSurfaceColor,
+          disabledBackgroundColor: disabledBackgroundColor,
           padding: contentPadding,
+          backgroundColor: backgroundColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius),
           ),
         ),
-        onPressed: onPressed,
-        child: Row(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  offer.label,
-                  style: TextStyle(
-                    color: labelTextColor,
-                    fontSize: labelFontSize,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                Text(
-                  'offer.timer!.tick.toString()',
-                  style: TextStyle(
-                    color: timerTextColor,
-                    fontSize: timerFontSize,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                Text(
-                  _getPriceString(),
-                  style: TextStyle(
-                    color: fullPriceTextColor,
-                    fontSize: priceFontSize,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+            Text(
+              offer.label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: labelFontSize),
+            ),
+            Text(
+              'offer.timer!.tick.toString()',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: timerTextColor,
+                fontSize: timerFontSize,
+                fontWeight: FontWeight.w400,
+              ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCreativeOfferWidget() {
+    return Material(
+      color: cSurfaceColor,
+      borderRadius: BorderRadius.circular(borderRadius),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onPressed,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: contentPadding,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            offer.label,
+                            style: TextStyle(
+                              color: labelTextColor,
+                              fontSize: labelFontSize,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                          ),
+                          Text(
+                            'offer.timer!.tick.toString()',
+                            style: TextStyle(
+                              color: timerTextColor,
+                              fontSize: timerFontSize,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          Text(
+                            _getPriceString(),
+                            style: TextStyle(
+                              color: fullPriceTextColor,
+                              fontSize: priceFontSize,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 50.0,
+                  ),
+                  Ink(
+                    width: 70,
+                    decoration: const BoxDecoration(
+                      color: cPrimaryColor,
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.shop,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
@@ -154,6 +241,7 @@ class CreditsOfferWidget extends StatelessWidget {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           padding: contentPadding,
+          disabledBackgroundColor: disabledBackgroundColor,
           backgroundColor: backgroundColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius),
@@ -204,7 +292,7 @@ class CreditsOfferWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: padding,
-      child: _buildSelectedOfferBasedOnType(),
+      child: _buildSelectedOfferBasedOnType(context),
     );
   }
 }

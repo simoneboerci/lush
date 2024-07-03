@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:lush_app/firebase_options.dart';
+
 import 'package:lush_app/models/lush_credits_offer.dart';
 
 import 'package:lush_app/models/lush_user.dart';
@@ -137,6 +138,18 @@ class FirebaseHelper {
       return snapshot.docs.map((doc) {
         return LushCreditsOffer.fromMap(doc.data()..['id'] = doc.id);
       }).toList();
+    });
+  }
+
+  static Stream<int> getTokensCountStreamFromCurrentUser() async* {
+    await ensureInitialized();
+
+    yield* FirebaseFirestore.instance
+        .collection(firebaseUserCollectionLabel)
+        .doc(getCurrentUserUid)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.data()!['lush_tokens_count'] as int;
     });
   }
 }
