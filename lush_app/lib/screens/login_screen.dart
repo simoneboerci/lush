@@ -27,7 +27,7 @@ class LoginScreen extends StatelessWidget {
       LushUser? loggedUser =
           await FirebaseHelper.loginWithEmailAndPassword(email, password);
       if (loggedUser != null) {
-        return await FirebaseHelper.getUserWithUid(loggedUser.userId);
+        return FirebaseHelper.getUserWithUid(loggedUser.userId);
       }
     }
 
@@ -61,8 +61,8 @@ class LoginScreen extends StatelessWidget {
   }
 
   void _completeLogin(BuildContext context, LushUser user) {
-    Navigator.pushReplacementNamed(context, '/first_step_verification_screen');
     Provider.of<UserProvider>(context, listen: false).setUser(user);
+    Navigator.pushReplacementNamed(context, '/shop_screen');
   }
 
   @override
