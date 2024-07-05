@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:lush_app/constants/colors.dart';
 import 'package:lush_app/constants/images.dart';
-
 import 'package:lush_app/models/direct_message.dart';
+import 'package:lush_app/services/firebase_helper.dart';
 
 import 'package:lush_app/widgets/custom_background.dart';
 import 'package:lush_app/widgets/direct_message_chat_widget.dart';
 import 'package:lush_app/widgets/lush_tokens_widget.dart';
-import 'package:lush_app/widgets/message_bubble_widget.dart';
 import 'package:lush_app/widgets/send_message_widget.dart';
 
 class DirectScreen extends StatelessWidget {
@@ -141,10 +138,22 @@ class DirectScreen extends StatelessWidget {
           children: [
             _buildAppBar(),
             _buildContactBar(),
-            DirectMessageChatWidget(),
+            const DirectMessageChatWidget(),
             SendMessageWidget(
               controller: _messageController,
-              onMessageSent: (message) {},
+              onMessageSent: (message) async {
+                await FirebaseHelper.sendMessage(
+                  DirectMessage(
+                    id: 'ejbfqwbfjqwbdqwd',
+                    chatId: 'iwugfouqwhfouqwhdoqdq',
+                    senderId: 'currentUserId',
+                    text: message,
+                    timestamp: DateTime.now(),
+                    isDelivered: true,
+                    isRead: true,
+                  ),
+                );
+              },
             ),
           ],
         ),

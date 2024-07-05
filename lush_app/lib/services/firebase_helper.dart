@@ -3,14 +3,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:lush_app/firebase_options.dart';
+import 'package:lush_app/models/chat_model.dart';
+import 'package:lush_app/models/direct_message.dart';
 
 import 'package:lush_app/models/lush_credits_offer.dart';
 
 import 'package:lush_app/models/lush_user.dart';
 
 class FirebaseHelper {
-  static const String firebaseUserCollectionLabel = 'users';
+  static const String firebaseUsersCollectionLabel = 'users';
   static const String firebaseOffersCollectionLabel = 'offers';
+  static const String firebaseChatsCollectionLabel = 'chats';
+  static const String firebaseMessagesCollectionLabel = 'messages';
 
   static String getCurrentUserUid = FirebaseAuth.instance.currentUser!.uid;
 
@@ -29,7 +33,7 @@ class FirebaseHelper {
     try {
       final DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
           await FirebaseFirestore.instance
-              .collection(firebaseUserCollectionLabel)
+              .collection(firebaseUsersCollectionLabel)
               .doc(uid)
               .get();
       if (documentSnapshot.exists && documentSnapshot.data() != null) {
@@ -120,7 +124,7 @@ class FirebaseHelper {
   static Future<void> storeUserData(LushUser user) async {
     try {
       await FirebaseFirestore.instance
-          .collection(firebaseUserCollectionLabel)
+          .collection(firebaseUsersCollectionLabel)
           .doc(user.userId)
           .set(user.toMap());
     } catch (e) {
@@ -145,11 +149,68 @@ class FirebaseHelper {
     await ensureInitialized();
 
     yield* FirebaseFirestore.instance
-        .collection(firebaseUserCollectionLabel)
+        .collection(firebaseUsersCollectionLabel)
         .doc(getCurrentUserUid)
         .snapshots()
         .map((snapshot) {
       return snapshot.data()!['lush_tokens_count'] as int;
     });
+  }
+
+  static Future<void> sendMessage(DirectMessage message) async {
+    final messageRef = FirebaseFirestore.instance
+        .collection(firebaseMessagesCollectionLabel)
+        .doc();
+    final messageData = message.toMap();
+    messageData['id'] = messageRef.id;
+    messageData['is_delivered'] = false;
+    messageData['is_read'] = false;
+
+    await messageRef.set(messageData);
+
+    // Aggiorna il campo isDelivered dopo che il messaggio è stato inviato con successo
+    await messageRef.update({'is_delivered': true});
+  }
+
+  static Future<void> markMessageAsRead(String messageId) async {
+    await FirebaseFirestore.instance
+        .collection(firebaseMessagesCollectionLabel)
+        .doc(messageId)
+        .update({'is_read': true});
+  }
+
+  static Stream<List<DirectMessage>> getMessagesFromChat(String chatId) async* {
+    yield* FirebaseFirestore.instance
+        .collection(firebaseMessagesCollectionLabel)
+        .where('chat_id', isEqualTo: chatId)
+        .orderBy('timestamp', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => DirectMessage.fromMap(doc.data()))
+            .toList());
+  }
+
+  static Future<void> createChat(String user1Id, String user2Id) async {
+    String chatId = user1Id.compareTo(user2Id) < 0
+        ? '${user1Id}_$user2Id'
+        : '${user2Id}_$user1Id';
+
+    await FirebaseFirestore.instance
+        .collection(firebaseChatsCollectionLabel)
+        .doc(chatId)
+        .set({
+      'participants': [user1Id, user2Id],
+      'last_message': '',
+      'last_message_timestamp': FieldValue.serverTimestamp(),
+    });
+  }
+
+  static Stream<QuerySnapshot> getUserChats(String userId) async* {
+    await ensureInitialized();
+
+    yield* FirebaseFirestore.instance
+        .collection(firebaseChatsCollectionLabel)
+        .where('participants', arrayContains: userId)
+        .snapshots();
   }
 }

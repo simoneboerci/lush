@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:lush_app/models/lush_credits_offer.dart';
 
 class LushUser {
@@ -10,14 +11,19 @@ class LushUser {
   DateTime? birthDate;
   String? birthAddress;
   String? residenceAddress;
-
   String? username;
   String? email;
   String? password;
   String? phoneNumber;
-
   int lushTokensCount;
   List<String>? reedemedOffers;
+
+  // Campi per le chat
+  String? profilePictureUrl;
+  DateTime? lastSeen;
+  String? fcmToken; // Per le notifiche push
+  List<String> activeChats;
+  bool isOnline;
 
   LushUser({
     required this.userId,
@@ -32,10 +38,13 @@ class LushUser {
     this.password,
     this.phoneNumber,
     this.lushTokensCount = 0,
-    this.reedemedOffers,
-  }) {
-    reedemedOffers = [];
-  }
+    this.reedemedOffers = const [],
+    this.profilePictureUrl,
+    this.lastSeen,
+    this.fcmToken,
+    this.activeChats = const [],
+    this.isOnline = false,
+  });
 
   factory LushUser.copyWith({
     required LushUser user,
@@ -51,6 +60,11 @@ class LushUser {
     String? phoneNumber,
     int? lushTokens,
     List<String>? reedemedOffers,
+    String? profilePictureUrl,
+    DateTime? lastSeen,
+    String? fcmToken,
+    List<String>? activeChats,
+    bool? isOnline,
   }) {
     return LushUser(
       userId: user.userId,
@@ -66,6 +80,11 @@ class LushUser {
       phoneNumber: phoneNumber ?? user.phoneNumber,
       lushTokensCount: lushTokens ?? user.lushTokensCount,
       reedemedOffers: reedemedOffers ?? user.reedemedOffers,
+      profilePictureUrl: profilePictureUrl ?? user.profilePictureUrl,
+      lastSeen: lastSeen ?? user.lastSeen,
+      fcmToken: fcmToken ?? user.fcmToken,
+      activeChats: activeChats ?? user.activeChats,
+      isOnline: isOnline ?? user.isOnline,
     );
   }
 
@@ -90,6 +109,14 @@ class LushUser {
       phoneNumber: map['phone_number'] ?? '',
       lushTokensCount: map['lush_tokens_count'] ?? '',
       reedemedOffers: redeemedOffersString,
+      profilePictureUrl: map['profile_picture_url'],
+      lastSeen: map['last_seen'] != null
+          ? (map['last_seen'] as Timestamp).toDate()
+          : null,
+      fcmToken: map['fcm_token'],
+      activeChats:
+          (map['active_chats'] as List<dynamic>?)?.cast<String>() ?? [],
+      isOnline: map['is_online'] ?? false,
     );
   }
 
@@ -108,6 +135,11 @@ class LushUser {
       'phone_number': phoneNumber,
       'lush_tokens_count': lushTokensCount,
       'reedemed_offers': reedemedOffers ?? [],
+      'profile_picture_url': profilePictureUrl,
+      'last_seen': lastSeen,
+      'fcm_token': fcmToken,
+      'active_chats': activeChats,
+      'is_online': isOnline,
     };
   }
 
@@ -129,5 +161,31 @@ class LushUser {
       reedemedOffers!.add(offer.id);
       return true;
     }
+  }
+
+  // Metodi per la gestione delle chat
+  void addActiveChat(String chatId) {
+    if (!activeChats.contains(chatId)) {
+      activeChats.add(chatId);
+    }
+  }
+
+  void removeActiveChat(String chatId) {
+    activeChats.remove(chatId);
+  }
+
+  void updateLastSeen() {
+    lastSeen = DateTime.now();
+  }
+
+  void setOnlineStatus(bool status) {
+    isOnline = status;
+    if (status) {
+      updateLastSeen();
+    }
+  }
+
+  void updateFcmToken(String newToken) {
+    fcmToken = newToken;
   }
 }

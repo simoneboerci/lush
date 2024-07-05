@@ -1,59 +1,66 @@
 import 'package:flutter/material.dart';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:lush_app/models/direct_message.dart';
+
+import 'package:lush_app/services/firebase_helper.dart';
 
 import 'package:lush_app/widgets/message_bubble_widget.dart';
 
 class DirectMessageChatWidget extends StatelessWidget {
-  DirectMessageChatWidget({super.key});
+  const DirectMessageChatWidget({
+    super.key,
+    //required this.chat,
+  });
 
-  final List<DirectMessage> messages = [
-    DirectMessage(text: 'Quando vuoi', sender: '', timestamp: Timestamp.now()),
-    DirectMessage(
-        text: 'Domani per che ora sei libera?',
-        sender: 'Me',
-        timestamp: Timestamp.now()),
-    DirectMessage(
-        text:
-            'Domani possiamo fare verso sera. Esco dal lavoro alle 18:00, va bene?',
-        sender: '',
-        timestamp: Timestamp.now()),
-    DirectMessage(
-        text: 'Altrimenti mercoledì alle 14:00, dimmi tu',
-        sender: '',
-        timestamp: Timestamp.now()),
-    DirectMessage(
-        text: 'Ottimo per domani alle 18:00',
-        sender: 'Me',
-        timestamp: Timestamp.now()),
-    DirectMessage(text: 'Perfetto :)', sender: '', timestamp: Timestamp.now()),
-    DirectMessage(
-        text: 'Un piccolo regalo per te',
-        sender: '',
-        timestamp: Timestamp.now()),
-  ];
+  //final ChatModel chat;
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: ListView.builder(
-        itemCount: messages.length,
-        itemBuilder: (context, index) {
-          final message = messages[messages.length - 1 - index];
-          String previousMessageSender = 'None';
-          try {
-            previousMessageSender =
-                messages[messages.length - 1 - index - 1].sender;
-          } catch (_) {}
-          EdgeInsets padding = message.sender != previousMessageSender
-              ? const EdgeInsets.only(bottom: 8.0)
-              : EdgeInsets.zero;
-          return Padding(
-            padding: padding,
-            child: MessageBubbleWidget(
-                message: message, isMe: message.sender == 'Me'),
+    return Flexible(
+      child: StreamBuilder<List<DirectMessage>>(
+        stream: FirebaseHelper.getMessagesFromChat('iwugfouqwhfouqwhdoqdq'),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          if (snapshot.hasError) {
+            return Center(
+              child: Text('Errr: ${snapshot.error}'),
+            );
+          }
+
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(
+              child: Text('No messages yet.'),
+            );
+          }
+
+          final messages = snapshot.data!;
+
+          return ListView.builder(
+            reverse: true,
+            itemCount: messages.length,
+            itemBuilder: (context, index) {
+              final message = messages[index];
+              String? previousMessageSender = index < messages.length - 1
+                  ? messages[index + 1].senderId
+                  : null;
+
+              EdgeInsets padding = message.senderId != previousMessageSender
+                  ? const EdgeInsets.only(bottom: 8.0)
+                  : EdgeInsets.zero;
+
+              return Padding(
+                padding: padding,
+                child: MessageBubbleWidget(
+                    message: message, isMe: message.senderId == 'currentUserId'
+                    //FirebaseHelper.getCurrentUserUid,
+                    ),
+              );
+            },
           );
         },
       ),

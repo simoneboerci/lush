@@ -102,7 +102,7 @@ class MessageBubbleWidget extends StatelessWidget {
               ),
               SizedBox(height: timestampSpacing),
               Text(
-                '${message.timestamp.toDate().hour.toString().padLeft(2, '0')}:${message.timestamp.toDate().minute.toString().padLeft(2, '0')}',
+                '${message.timestamp.hour.toString().padLeft(2, '0')}:${message.timestamp.minute.toString().padLeft(2, '0')}',
                 style: TextStyle(
                   fontSize: currentTimestampFontSize,
                   color: currentTimestampColor,
