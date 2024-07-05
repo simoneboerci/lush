@@ -1,12 +1,11 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import 'package:lush_app/constants/colors.dart';
 
 import 'package:lush_app/models/direct_message.dart';
-import 'package:lush_app/widgets/action_menu_direct_overlay_widget.dart';
+
+import 'package:lush_app/widgets/action_item_direct_overlay_widget.dart';
 import 'package:lush_app/widgets/re_actions_direct_overlay_widget.dart';
-import 'package:lush_app/widgets/reactions_direct_overlay_widget.dart';
 
 class MessageBubbleWidget extends StatelessWidget {
   const MessageBubbleWidget({
@@ -37,6 +36,8 @@ class MessageBubbleWidget extends StatelessWidget {
     this.timestampColor = Colors.black,
     this.isMeTimestampFontSize = 12.0,
     this.timestampFontSize = 12.0,
+    this.timestampSpacing = 4.0,
+    this.maxMessageBoxLength = 0.75,
   });
 
   final DirectMessage message;
@@ -58,59 +59,13 @@ class MessageBubbleWidget extends StatelessWidget {
   final Color? timestampColor;
   final double isMeTimestampFontSize;
   final double timestampFontSize;
-
-  void _showReactionAndMenu(
-      BuildContext context, RenderBox box, Offset offset) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isRightAligned = isMe;
-
-    final reactionBarPosition = isRightAligned
-        ? Offset(screenWidth - 250, offset.dy - 50)
-        : Offset(offset.dx, offset.dy - 50);
-
-    final menuPosition = isRightAligned
-        ? Offset(screenWidth - 200, offset.dy + box.size.height)
-        : Offset(offset.dx, offset.dy + box.size.height);
-
-    OverlayEntry reactionBarEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        left: reactionBarPosition.dx,
-        top: reactionBarPosition.dy,
-        child: const ReactionsDirectOverlayWidget(),
-      ),
-    );
-
-    OverlayEntry menuEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        left: menuPosition.dx,
-        top: menuPosition.dy,
-        child: const ActionMenuDirectOverlayWidget(),
-      ),
-    );
-
-    Overlay.of(context).insert(reactionBarEntry);
-    Overlay.of(context).insert(menuEntry);
-
-    // Rimuovi gli overlay dopo un tap ovunque sullo schermo
-    void removeOverlays(event) {
-      reactionBarEntry.remove();
-      menuEntry.remove();
-    }
-
-    /*Future.delayed(Duration.zero, () {
-      GestureBinding.instance.pointerRouter
-          .addGlobalRoute((PointerEvent event) {
-        if (event is PointerDownEvent) {
-          removeOverlays(event);
-          GestureBinding.instance.pointerRouter
-              .removeGlobalRoute(removeOverlays);
-        }
-      });
-    });*/
-  }
+  final double timestampSpacing;
+  final double maxMessageBoxLength;
 
   @override
   Widget build(BuildContext context) {
+    final GlobalKey messageKey = GlobalKey();
+
     final currentBackgroundColor = isMe ? isMeBackgroundColor : backgroundColor;
     final currentAlign = isMe ? isMeAlign : align;
     final currentBorderRadius = isMe ? isMeBorderRadius : borderRadius;
@@ -123,14 +78,11 @@ class MessageBubbleWidget extends StatelessWidget {
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: GestureDetector(
-        onLongPress: () {
-          final RenderBox box = context.findRenderObject() as RenderBox;
-          final Offset offset = box.localToGlobal(Offset.zero);
-          _showReactionAndMenu(context, box, offset);
-        },
+        onLongPress: () => _showReActionsOverlay(context, messageKey),
         child: Container(
+          key: messageKey,
           constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width * 0.75,
+            maxWidth: MediaQuery.of(context).size.width * maxMessageBoxLength,
           ),
           decoration: BoxDecoration(
             color: currentBackgroundColor,
@@ -148,7 +100,7 @@ class MessageBubbleWidget extends StatelessWidget {
                   color: currentTextColor,
                 ),
               ),
-              const SizedBox(height: 4.0),
+              SizedBox(height: timestampSpacing),
               Text(
                 '${message.timestamp.toDate().hour.toString().padLeft(2, '0')}:${message.timestamp.toDate().minute.toString().padLeft(2, '0')}',
                 style: TextStyle(
@@ -160,6 +112,50 @@ class MessageBubbleWidget extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  void _showReActionsOverlay(BuildContext context, GlobalKey messageKey) {
+    ReActionsDirectOverlayWidget.showReActionsDirectOverlay(
+      context: context,
+      isMe: isMe,
+      messageWidget: this,
+      messageKey: messageKey,
+      actions: [
+        ActionItemDirectOverlayWidget(
+          label: 'Aggiungi ai preferiti',
+          icon: Icons.bookmark_border,
+          onTap: () {},
+        ),
+        ActionItemDirectOverlayWidget(
+          label: 'Rispondi',
+          icon: Icons.replay,
+          onTap: () {},
+        ),
+        ActionItemDirectOverlayWidget(
+          label: 'Copia',
+          icon: Icons.content_copy,
+          onTap: () {},
+        ),
+        ActionItemDirectOverlayWidget(
+          label: 'Fissa',
+          icon: Icons.push_pin_outlined,
+          onTap: () {},
+        ),
+        ActionItemDirectOverlayWidget(
+          label: 'Segnala',
+          icon: Icons.flag_outlined,
+          onTap: () {},
+        ),
+        ActionItemDirectOverlayWidget(
+          label: 'Elimina',
+          icon: Icons.delete_outlined,
+          iconColor: cPrimaryColor,
+          textColor: cPrimaryColor,
+          onTap: () {},
+          addDivider: false,
+        ),
+      ],
     );
   }
 }
