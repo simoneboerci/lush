@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
-
 import 'package:lush_app/services/firebase_helper.dart';
-import 'package:lush_app/services/user_provider.dart';
 
 import 'routes.dart';
 
+import 'package:lush_app/services/chat_provider.dart';
+import 'package:lush_app/services/user_provider.dart';
+
 void main() {
-  runApp(ChangeNotifierProvider(
-    create: (_) => UserProvider(),
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider<UserProvider>(create: (_) => UserProvider()),
+      ChangeNotifierProvider<ChatProvider>(create: (_) => ChatProvider()),
+    ],
     child: const MyApp(),
   ));
 }

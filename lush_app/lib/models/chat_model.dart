@@ -3,8 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class ChatModel {
   final String id;
   final List<String> participantIds;
-  final String lastMessageText;
-  final DateTime lastMessageTimestamp;
+  final String lastMessage;
+  final DateTime? lastMessageTimestamp;
   final bool isGroup;
   final String? groupName;
   final String? groupImageUrl;
@@ -13,7 +13,7 @@ class ChatModel {
   ChatModel({
     required this.id,
     required this.participantIds,
-    required this.lastMessageText,
+    required this.lastMessage,
     required this.lastMessageTimestamp,
     required this.isGroup,
     this.groupName,
@@ -23,14 +23,15 @@ class ChatModel {
 
   factory ChatModel.fromMap(Map<String, dynamic> map) {
     return ChatModel(
-      id: map['id'],
+      id: map['id'] ?? '',
       participantIds: List<String>.from(map['participant_ids']),
-      lastMessageText: map['last_message_text'],
-      lastMessageTimestamp:
-          (map['last_message_timestamp'] as Timestamp).toDate(),
-      isGroup: map['is_group'],
-      groupName: map['group_name'],
-      groupImageUrl: map['group_image_url'],
+      lastMessage: map['last_message'] ?? '',
+      lastMessageTimestamp: map['last_message_timestamp'] != ''
+          ? (map['last_message_timestamp'] as Timestamp).toDate()
+          : null,
+      isGroup: map['is_group'] ?? false,
+      groupName: map['group_name'] ?? '',
+      groupImageUrl: map['group_image_url'] ?? '',
       unreadCounts: Map<String, int>.from(map['unread_counts']),
     );
   }
@@ -39,8 +40,8 @@ class ChatModel {
     return {
       'id': id,
       'participant_ids': participantIds,
-      'last_message_text': lastMessageText,
-      'last_message_timestamp': Timestamp.fromDate(lastMessageTimestamp),
+      'last_message': lastMessage,
+      'last_message_timestamp': Timestamp.fromDate(lastMessageTimestamp!),
       'is_group': isGroup,
       'group_name': groupName,
       'group_image_url': groupImageUrl,

@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 
+import 'package:provider/provider.dart';
+
 import 'package:lush_app/constants/colors.dart';
 import 'package:lush_app/constants/images.dart';
+
+import 'package:lush_app/models/chat_model.dart';
 import 'package:lush_app/models/direct_message.dart';
+
+import 'package:lush_app/services/chat_provider.dart';
 import 'package:lush_app/services/firebase_helper.dart';
 
 import 'package:lush_app/widgets/custom_background.dart';
@@ -38,7 +44,7 @@ class DirectScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContactBar() {
+  Widget _buildContactBar(BuildContext context, ChatModel chat) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 28.0, horizontal: 8.0),
       child: Row(
@@ -52,7 +58,9 @@ class DirectScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   backgroundColor: Colors.transparent,
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pop(context);
+                },
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -73,26 +81,26 @@ class DirectScreen extends StatelessWidget {
               const SizedBox(
                 width: 8.0,
               ),
-              const Row(
+              Row(
                 children: [
-                  CircleAvatar(
+                  const CircleAvatar(
                     backgroundImage: cLushTokenIcon,
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 8.0,
                   ),
                   Column(
                     children: [
                       Text(
-                        'Username_88',
-                        style: TextStyle(
+                        chat.participantIds[1],
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        'Attivo/a 2h fa',
-                        style: TextStyle(
+                        chat.lastMessageTimestamp.toString(),
+                        style: const TextStyle(
                           color: Colors.white,
                         ),
                       ),
@@ -130,6 +138,8 @@ class DirectScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ChatModel chat =
+        Provider.of<ChatProvider>(context, listen: false).chat!;
     return CustomBackground(
       padding: EdgeInsets.zero,
       child: Padding(
@@ -137,7 +147,7 @@ class DirectScreen extends StatelessWidget {
         child: Column(
           children: [
             _buildAppBar(),
-            _buildContactBar(),
+            _buildContactBar(context, chat),
             const DirectMessageChatWidget(),
             SendMessageWidget(
               controller: _messageController,
@@ -145,7 +155,7 @@ class DirectScreen extends StatelessWidget {
                 await FirebaseHelper.sendMessage(
                   DirectMessage(
                     id: 'ejbfqwbfjqwbdqwd',
-                    chatId: 'iwugfouqwhfouqwhdoqdq',
+                    chatId: chat.id,
                     senderId: 'currentUserId',
                     text: message,
                     timestamp: DateTime.now(),

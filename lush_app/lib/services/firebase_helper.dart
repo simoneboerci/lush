@@ -180,6 +180,8 @@ class FirebaseHelper {
   }
 
   static Stream<List<DirectMessage>> getMessagesFromChat(String chatId) async* {
+    await ensureInitialized();
+
     yield* FirebaseFirestore.instance
         .collection(firebaseMessagesCollectionLabel)
         .where('chat_id', isEqualTo: chatId)
@@ -199,18 +201,21 @@ class FirebaseHelper {
         .collection(firebaseChatsCollectionLabel)
         .doc(chatId)
         .set({
-      'participants': [user1Id, user2Id],
+      'participant_ids': [user1Id, user2Id],
       'last_message': '',
       'last_message_timestamp': FieldValue.serverTimestamp(),
     });
   }
 
-  static Stream<QuerySnapshot> getUserChats(String userId) async* {
+  static Stream<List<ChatModel>> getUserChats(String userId) async* {
     await ensureInitialized();
 
     yield* FirebaseFirestore.instance
         .collection(firebaseChatsCollectionLabel)
-        .where('participants', arrayContains: userId)
-        .snapshots();
+        .where('participant_ids', arrayContains: userId)
+        .orderBy('last_message_timestamp', descending: true)
+        .snapshots()
+        .map((snapshot) =>
+            snapshot.docs.map((doc) => ChatModel.fromMap(doc.data())).toList());
   }
 }

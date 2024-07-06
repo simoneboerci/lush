@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:lush_app/models/chat_model.dart';
 
 import 'package:lush_app/models/direct_message.dart';
+import 'package:lush_app/services/chat_provider.dart';
 
 import 'package:lush_app/services/firebase_helper.dart';
 
 import 'package:lush_app/widgets/message_bubble_widget.dart';
+import 'package:provider/provider.dart';
 
 class DirectMessageChatWidget extends StatelessWidget {
   const DirectMessageChatWidget({
@@ -16,9 +19,12 @@ class DirectMessageChatWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ChatModel chat =
+        Provider.of<ChatProvider>(context, listen: false).chat!;
+
     return Flexible(
       child: StreamBuilder<List<DirectMessage>>(
-        stream: FirebaseHelper.getMessagesFromChat('iwugfouqwhfouqwhdoqdq'),
+        stream: FirebaseHelper.getMessagesFromChat(chat.id),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
