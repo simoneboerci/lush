@@ -50,7 +50,10 @@ class LushTokensWidget extends StatelessWidget {
                 } else if (snapshot.hasError) {
                   return Text(
                     'Errore: ${snapshot.error}',
-                    style: TextStyle(color: Colors.red, fontSize: fontSize),
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: fontSize,
+                    ),
                   );
                 } else if (snapshot.hasData) {
                   return Text(

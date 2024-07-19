@@ -66,7 +66,6 @@ class DirectMessageChatWidget extends StatelessWidget {
           final messages = snapshot.data!;
 
           return ListView.builder(
-            reverse: true,
             controller: scrollController,
             itemCount: messages.length,
             itemBuilder: (context, index) {
@@ -82,10 +81,11 @@ class DirectMessageChatWidget extends StatelessWidget {
               return Padding(
                 padding: padding,
                 child: MessageBubbleWidget(
-                  message: message, isMe: message.senderId == 'currentUserId',
+                  message: message,
+                  isMe: message.senderId ==
+                      FirebaseHelper.userHelper.getCurrentUserUid,
                   onReplyTap: (replyMessageId) =>
                       _scrollToMessage(replyMessageId, messages),
-                  //TODO:FirebaseHelper.getCurrentUserUid,
                   onLongPressActions: [
                     ActionItemDirectOverlayWidget(
                       label: 'Aggiungi ai preferiti',

@@ -11,7 +11,8 @@ class FirebaseChatsHelper {
   static const String firebaseChatsCollectionLabel = 'chats';
 
   // Metodo per creare una nuova chat nel database tra due utenti
-  Future<void> createChatBetweenUsers(String user1Id, String user2Id) async {
+  Future<ChatModel> createChatBetweenUsers(
+      String user1Id, String user2Id) async {
     // Assicura che firebase sia inizializzato
     await FirebaseHelper.ensureInitialized();
 
@@ -21,16 +22,21 @@ class FirebaseChatsHelper {
         ? '${user1Id}_$user2Id'
         : '${user2Id}_$user1Id';
 
-    // Aggiorna il database
+    // Crea la nuova chat
+    ChatModel newChat = ChatModel(
+      id: chatId,
+      userIds: [user1Id, user2Id],
+      messages: [],
+    );
+
+    // Aggiungi la chat al database
     await FirebaseFirestore.instance
         .collection(firebaseChatsCollectionLabel)
         .doc(chatId)
-        .set({
-      ChatModel.idLabel: chatId,
-      ChatModel.userIdsLabel: [user1Id, user2Id],
-      ChatModel.messagesLabel: [],
-      // Altri campi legati alla chat
-    });
+        .set(newChat.toMap());
+
+    // Ritorna la chat appena creata
+    return newChat;
   }
 
   // Ottieni una lista di messaggi a partire da una chat
@@ -77,23 +83,25 @@ class FirebaseChatsHelper {
     // Aggiorna il database
     await chatRef.update({
       ChatModel.messagesLabel: FieldValue.arrayUnion([messageData]),
-      ChatModel.lastMessageLabel: message,
+      ChatModel.lastMessageLabel: messageData,
       // Altri campi legati al messaggio
     });
   }
 
-  // Ottieni la lista di chat in cui l'utente è presente
   Stream<List<ChatModel>> getUserChats(String userId) async* {
-    // Assicura che firebase sia inizializzato
     await FirebaseHelper.ensureInitialized();
 
-    // Ottieni la lista di chat dell'utente ordinata per il timestamp dell'ultimo messaggio
     yield* FirebaseFirestore.instance
         .collection(firebaseChatsCollectionLabel)
         .where(ChatModel.userIdsLabel, arrayContains: userId)
-        .orderBy(ChatModel.lastMessageLabel, descending: true)
+        .orderBy('${ChatModel.lastMessageLabel}.${MessageModel.timestampLabel}',
+            descending: true)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => ChatModel.fromMap(doc.data())).toList());
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        var data = doc.data();
+        return ChatModel.fromMap(data);
+      }).toList();
+    });
   }
 }

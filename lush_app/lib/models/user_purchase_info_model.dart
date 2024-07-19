@@ -19,7 +19,7 @@ class UserPurchaseInfoModel {
       lushTokens:
           map[lushTokensLabel] != null ? map[lushTokensLabel] as int : 0,
       redeemedOffers: map[redeemedOffersLabel] != null
-          ? map[redeemedOffersLabel] as List<String>
+          ? List<String>.from(map[redeemedOffersLabel] as List<dynamic>)
           : const [],
     );
   }

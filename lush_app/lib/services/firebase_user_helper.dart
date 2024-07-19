@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:lush_app/models/user_purchase_info_model.dart';
 
 import 'package:lush_app/services/firebase_helper.dart';
 
 import 'package:lush_app/models/user_model.dart';
+import 'package:lush_app/models/user_chat_info_model.dart';
 
 // Classe che gestisce la creazione, la manipolazione e la gestione degli utenti e dei loro parametri tramite firebase
 class FirebaseUserHelper {
@@ -55,23 +57,59 @@ class FirebaseUserHelper {
 
   // Ottieni il numero di token correnti dell'utente corrente
   Stream<int> getTokensCountStreamFromCurrentUser() async* {
-    // Assicura che firebase sia inizializzato
     await FirebaseHelper.ensureInitialized();
 
-    // Ottieni l'utente corrente
+    // Ottieni i dati dell'utente nel database
     yield* FirebaseFirestore.instance
         .collection(firebaseUsersCollectionLabel)
         .doc(getCurrentUserUid)
         .snapshots()
         .map((snapshot) {
-      // Verifica che l'utente esista e che contenga dei dati
-      if (snapshot.exists && snapshot.data() != null) {
-        // Ritorna il numero di token che l'utente possiede
-        return snapshot.data()!['lush_tokens_count'] as int;
+      final data = snapshot.data();
+      // Ottieni il riferimento all'oggetto che gestisce gli acquisti
+      final purchaseInfo = data?[UserModel.purchaseInfoLabel];
+      // Ottieni il rifertimento al numero di token posseduti dall'utente
+      final tokensValue = purchaseInfo?[UserPurchaseInfoModel.lushTokensLabel];
+
+      // Restituisce tokensValue se è di tipo int, altrimenti -1
+      return tokensValue is int ? tokensValue : -1;
+    });
+  }
+
+  // Metodo per ottenere una lista di utenti registrati in base a una query di testo
+  Future<List<UserModel>> getUsersByQuery({
+    required String query,
+    bool skipCurrentUser = true,
+  }) async {
+    // Assicura che firebase sia inizializzato
+    await FirebaseHelper.ensureInitialized();
+    try {
+      // Ottieni la lista di utenti registrati che hanno un username simile alla query
+      final snapshot = await FirebaseFirestore.instance
+          .collection(firebaseUsersCollectionLabel)
+          .where(
+              '${UserModel.chatInfoLabel}.${UserChatInfoModel.usernameLabel}',
+              isGreaterThanOrEqualTo: query)
+          .where(
+              '${UserModel.chatInfoLabel}.${UserChatInfoModel.usernameLabel}',
+              isLessThanOrEqualTo: '$query\uf8ff')
+          .get();
+
+      // Converti i documenti in UserModel
+      List<UserModel> users =
+          snapshot.docs.map((doc) => UserModel.fromMap(doc.data())).toList();
+
+      // Se skipCurrentUser è true, filtra l'utente corrente dalla lista
+      if (skipCurrentUser && getCurrentUserUid != null) {
+        users = users.where((user) => user.id != getCurrentUserUid).toList();
       }
 
-      // Se l'operazione non va a buon fine ritorna un numero di token negativo
-      return -1;
-    });
+      // Ritorna la lista filtrata di utenti
+      return users;
+    } catch (e) {
+      print('Errore durante la ricerca query degli utenti: $e');
+    }
+    // Se l'operazione non va a buon fine ritorna una lista vuota
+    return const [];
   }
 }

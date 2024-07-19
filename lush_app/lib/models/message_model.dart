@@ -26,12 +26,12 @@ class MessageModel {
 
   factory MessageModel.fromMap(Map<String, dynamic> map) {
     return MessageModel(
-      id: map[idLabel],
-      chatId: map[chatIdLabel],
-      senderId: map[senderIdLabel],
-      text: map[textLabel],
+      id: map[idLabel] as String? ?? '',
+      chatId: map[chatIdLabel] as String? ?? '',
+      senderId: map[senderIdLabel] as String? ?? '',
+      text: map[textLabel] as String? ?? '',
       timestamp: (map[timestampLabel] as Timestamp).toDate(),
-      replyToMessageId: map[replyToMessageIdLabel],
+      replyToMessageId: map[replyToMessageIdLabel] as String?,
     );
   }
 

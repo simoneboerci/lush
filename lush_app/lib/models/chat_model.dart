@@ -21,9 +21,15 @@ class ChatModel {
   factory ChatModel.fromMap(Map<String, dynamic> map) {
     return ChatModel(
       id: map[idLabel] as String,
-      userIds: List<String>.from(map[userIdsLabel]),
-      messages: List<MessageModel>.from(map[messagesLabel]),
-      lastMessage: map[lastMessageLabel] as MessageModel?,
+      userIds: List<String>.from(map[userIdsLabel] ?? []),
+      messages: (map[messagesLabel] as List<dynamic>?)
+              ?.map(
+                  (item) => MessageModel.fromMap(item as Map<String, dynamic>))
+              .toList() ??
+          [],
+      lastMessage: map[lastMessageLabel] != null
+          ? MessageModel.fromMap(map[lastMessageLabel] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -31,8 +37,8 @@ class ChatModel {
     return {
       idLabel: id,
       userIdsLabel: userIds,
-      messagesLabel: messages,
-      lastMessageLabel: lastMessage
+      messagesLabel: messages.map((msg) => msg.toMap()).toList(),
+      lastMessageLabel: lastMessage?.toMap(),
     };
   }
 }

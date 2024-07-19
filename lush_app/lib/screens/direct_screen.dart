@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lush_app/models/user_model.dart';
 
 import 'package:provider/provider.dart';
 
@@ -38,6 +39,14 @@ class _DirectScreenState extends State<DirectScreen> {
     });
   }
 
+  Future<String> _getOtherUserName(ChatModel chat) async {
+    final currentUserId = FirebaseHelper.userHelper.getCurrentUserUid!;
+    final otherUserId = chat.userIds.firstWhere((id) => id != currentUserId);
+    final otherUser =
+        await FirebaseHelper.userHelper.getUserWithUid(otherUserId);
+    return otherUser?.chatInfo.username ?? 'Utente sconosciuto';
+  }
+
   Widget _buildAppBar() {
     return const Padding(
       padding: EdgeInsets.symmetric(
@@ -62,6 +71,9 @@ class _DirectScreenState extends State<DirectScreen> {
   }
 
   Widget _buildContactBar(BuildContext context, ChatModel chat) {
+    final currentUserId = FirebaseHelper.userHelper.getCurrentUserUid;
+    final List<UserModel> participants =
+        Provider.of<ChatProvider>(context, listen: false).participants;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 28.0, horizontal: 8.0),
       child: Row(
@@ -107,9 +119,14 @@ class _DirectScreenState extends State<DirectScreen> {
                     width: 8.0,
                   ),
                   Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
-                        chat.userIds[1],
+                        participants
+                                .firstWhere((user) => user.id != currentUserId)
+                                .chatInfo
+                                .username ??
+                            'Anonimo',
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -117,7 +134,7 @@ class _DirectScreenState extends State<DirectScreen> {
                       ),
                       chat.lastMessage != null
                           ? Text(
-                              chat.lastMessage!.timestamp.toString(),
+                              '${participants.firstWhere((user) => user.id != currentUserId).chatInfo.lastSeen.hour.toString().padLeft(2, '0')}:${participants.firstWhere((user) => user.id != currentUserId).chatInfo.lastSeen.minute.toString().padLeft(2, '0')}',
                               style: const TextStyle(
                                 color: Colors.white,
                               ),
@@ -204,9 +221,9 @@ class _DirectScreenState extends State<DirectScreen> {
                 await FirebaseHelper.chatsHelper.sendMessage(
                   chat.id,
                   MessageModel(
-                    id: 'ejbfqwbfjqwbdqwd',
+                    id: '',
                     chatId: chat.id,
-                    senderId: 'currentUserId',
+                    senderId: FirebaseHelper.userHelper.getCurrentUserUid!,
                     text: message,
                     timestamp: DateTime.now(),
                     replyToMessageId: repliedMessage?.id,

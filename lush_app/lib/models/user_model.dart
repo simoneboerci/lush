@@ -28,9 +28,9 @@ class UserModel {
     return UserModel(
       id: map[idLabel] ?? '',
       personalInfo: UserPersonalInfoModel.fromMap(map[personalInfoLabel]),
-      contactInfo: UserContactInfoModel.fromMap(map[personalInfoLabel]),
-      chatInfo: UserChatInfoModel.fromMap(map[personalInfoLabel]),
-      purchaseInfo: UserPurchaseInfoModel.fromMap(map[personalInfoLabel]),
+      contactInfo: UserContactInfoModel.fromMap(map[contactInfoLabel]),
+      chatInfo: UserChatInfoModel.fromMap(map[chatInfoLabel]),
+      purchaseInfo: UserPurchaseInfoModel.fromMap(map[purchaseInfoLabel]),
     );
   }
 

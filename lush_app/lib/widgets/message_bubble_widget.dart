@@ -88,7 +88,7 @@ class MessageBubbleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final GlobalKey messageKey = GlobalKey();
+    final GlobalKey messageKey = GlobalKey(); // Ripristina il GlobalKey
 
     final currentBackgroundColor = isMe ? isMeBackgroundColor : backgroundColor;
     final currentAlign = isMe ? isMeAlign : align;
@@ -104,7 +104,7 @@ class MessageBubbleWidget extends StatelessWidget {
       child: GestureDetector(
         onLongPress: () => _showReActionsOverlay(context, messageKey),
         child: Container(
-          key: messageKey,
+          key: messageKey, // Aggiungi il GlobalKey al Container
           constraints: BoxConstraints(
             maxWidth: MediaQuery.of(context).size.width * maxMessageBoxLength,
           ),
@@ -117,43 +117,56 @@ class MessageBubbleWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: currentAlign,
             children: [
-              repliedMessage != null
-                  ? InkWell(
-                      onTap: () => onReplyTap(message!.replyToMessageId!),
-                      child: Container(
-                        color: repliedMessageContainerColor,
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.circular(repliedMessageBorderRadius),
+              if (repliedMessage != null)
+                InkWell(
+                  onTap: () => onReplyTap(message!.replyToMessageId!),
+                  child: Container(
+                    color: repliedMessageContainerColor,
+                    padding: const EdgeInsets.all(8.0),
+                    decoration: BoxDecoration(
+                      borderRadius:
+                          BorderRadius.circular(repliedMessageBorderRadius),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          repliedMessage!.senderId,
+                          style: TextStyle(
+                            color: repliedMessageContactNameColor,
+                            fontSize: repliedMessageContactNameFontSize,
+                            fontWeight: repliedMessageContactNameFontWeight,
+                          ),
                         ),
-                        child: Column(
-                          children: [
-                            Text(
-                              repliedMessage!.senderId,
-                              style: TextStyle(
-                                color: repliedMessageContactNameColor,
-                                fontSize: repliedMessageContactNameFontSize,
-                                fontWeight: repliedMessageContactNameFontWeight,
-                              ),
-                            ),
-                            Text(
-                              repliedMessage!.text,
-                              style: TextStyle(
-                                color: repliedMessageTextColor,
-                                fontSize: repliedMessageTextFontSize,
-                                fontWeight: repliedMessageTextFontWeight,
-                              ),
-                            ),
-                          ],
+                        Text(
+                          repliedMessage!.text,
+                          style: TextStyle(
+                            color: repliedMessageTextColor,
+                            fontSize: repliedMessageTextFontSize,
+                            fontWeight: repliedMessageTextFontWeight,
+                          ),
                         ),
-                      ),
-                    )
-                  : Container(),
-              Text(
-                message!.text,
-                style: TextStyle(
-                  fontSize: currentFontSize,
-                  color: currentTextColor,
+                      ],
+                    ),
+                  ),
+                ),
+              SizedBox(
+                  height: repliedMessage != null
+                      ? 8.0
+                      : 0), // Spazio tra il messaggio risposto e il messaggio attuale
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth:
+                      MediaQuery.of(context).size.width * maxMessageBoxLength,
+                ),
+                child: Text(
+                  message!.text,
+                  style: TextStyle(
+                    fontSize: currentFontSize,
+                    color: currentTextColor,
+                  ),
+                  softWrap: true,
+                  overflow: TextOverflow.visible,
                 ),
               ),
               SizedBox(height: timestampSpacing),

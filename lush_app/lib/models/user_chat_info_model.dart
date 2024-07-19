@@ -36,7 +36,7 @@ class UserChatInfoModel {
           ? (map[lastSeenLabel] as Timestamp).toDate()
           : DateTime.now(),
       activeChatsIds: map[activeChatsIdsLabel] != null
-          ? map[activeChatsIdsLabel] as List<String>
+          ? List<String>.from(map[activeChatsIdsLabel] as List<dynamic>)
           : const [],
       isOnline: map[isOnlineLabel] != null ? map[isOnlineLabel] as bool : true,
     );
