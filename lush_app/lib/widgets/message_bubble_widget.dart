@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:lush_app/constants/colors.dart';
 
-import 'package:lush_app/models/direct_message.dart';
+import 'package:lush_app/models/message_model.dart';
 
 import 'package:lush_app/widgets/action_item_direct_overlay_widget.dart';
 import 'package:lush_app/widgets/re_actions_direct_overlay_widget.dart';
@@ -38,9 +38,20 @@ class MessageBubbleWidget extends StatelessWidget {
     this.timestampFontSize = 12.0,
     this.timestampSpacing = 4.0,
     this.maxMessageBoxLength = 0.75,
+    this.repliedMessage,
+    this.repliedMessageContactNameColor = cPrimaryColor,
+    this.repliedMessageTextColor = Colors.black38,
+    this.repliedMessageBorderRadius = 16.0,
+    this.repliedMessageContainerColor = Colors.black38,
+    this.repliedMessageContactNameFontSize = 14.0,
+    this.repliedMessageTextFontSize = 14.0,
+    this.repliedMessageContactNameFontWeight = FontWeight.bold,
+    this.repliedMessageTextFontWeight = FontWeight.normal,
+    required this.onReplyTap,
+    required this.onLongPressActions,
   });
 
-  final DirectMessage message;
+  final MessageModel? message;
   final bool isMe;
 
   final EdgeInsets padding;
@@ -61,6 +72,19 @@ class MessageBubbleWidget extends StatelessWidget {
   final double timestampFontSize;
   final double timestampSpacing;
   final double maxMessageBoxLength;
+
+  final MessageModel? repliedMessage;
+  final Color? repliedMessageContainerColor;
+  final Color? repliedMessageTextColor;
+  final Color? repliedMessageContactNameColor;
+  final double repliedMessageTextFontSize;
+  final double repliedMessageContactNameFontSize;
+  final double repliedMessageBorderRadius;
+  final FontWeight repliedMessageContactNameFontWeight;
+  final FontWeight repliedMessageTextFontWeight;
+  final Function(String) onReplyTap;
+
+  final List<ActionItemDirectOverlayWidget> onLongPressActions;
 
   @override
   Widget build(BuildContext context) {
@@ -93,8 +117,40 @@ class MessageBubbleWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: currentAlign,
             children: [
+              repliedMessage != null
+                  ? InkWell(
+                      onTap: () => onReplyTap(message!.replyToMessageId!),
+                      child: Container(
+                        color: repliedMessageContainerColor,
+                        decoration: BoxDecoration(
+                          borderRadius:
+                              BorderRadius.circular(repliedMessageBorderRadius),
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              repliedMessage!.senderId,
+                              style: TextStyle(
+                                color: repliedMessageContactNameColor,
+                                fontSize: repliedMessageContactNameFontSize,
+                                fontWeight: repliedMessageContactNameFontWeight,
+                              ),
+                            ),
+                            Text(
+                              repliedMessage!.text,
+                              style: TextStyle(
+                                color: repliedMessageTextColor,
+                                fontSize: repliedMessageTextFontSize,
+                                fontWeight: repliedMessageTextFontWeight,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : Container(),
               Text(
-                message.text,
+                message!.text,
                 style: TextStyle(
                   fontSize: currentFontSize,
                   color: currentTextColor,
@@ -102,7 +158,7 @@ class MessageBubbleWidget extends StatelessWidget {
               ),
               SizedBox(height: timestampSpacing),
               Text(
-                '${message.timestamp.hour.toString().padLeft(2, '0')}:${message.timestamp.minute.toString().padLeft(2, '0')}',
+                '${message?.timestamp.hour.toString().padLeft(2, '0')}:${message?.timestamp.minute.toString().padLeft(2, '0')}',
                 style: TextStyle(
                   fontSize: currentTimestampFontSize,
                   color: currentTimestampColor,
@@ -121,41 +177,7 @@ class MessageBubbleWidget extends StatelessWidget {
       isMe: isMe,
       messageWidget: this,
       messageKey: messageKey,
-      actions: [
-        ActionItemDirectOverlayWidget(
-          label: 'Aggiungi ai preferiti',
-          icon: Icons.bookmark_border,
-          onTap: () {},
-        ),
-        ActionItemDirectOverlayWidget(
-          label: 'Rispondi',
-          icon: Icons.replay,
-          onTap: () {},
-        ),
-        ActionItemDirectOverlayWidget(
-          label: 'Copia',
-          icon: Icons.content_copy,
-          onTap: () {},
-        ),
-        ActionItemDirectOverlayWidget(
-          label: 'Fissa',
-          icon: Icons.push_pin_outlined,
-          onTap: () {},
-        ),
-        ActionItemDirectOverlayWidget(
-          label: 'Segnala',
-          icon: Icons.flag_outlined,
-          onTap: () {},
-        ),
-        ActionItemDirectOverlayWidget(
-          label: 'Elimina',
-          icon: Icons.delete_outlined,
-          iconColor: cPrimaryColor,
-          textColor: cPrimaryColor,
-          onTap: () {},
-          addDivider: false,
-        ),
-      ],
+      actions: onLongPressActions,
     );
   }
 }

@@ -1,36 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'package:lush_app/constants/colors.dart';
-import 'package:lush_app/models/lush_user.dart';
+
+import 'package:lush_app/models/user_model.dart';
+import 'package:lush_app/models/shop_offer_model.dart';
 
 import 'package:lush_app/services/firebase_helper.dart';
-
-import 'package:lush_app/models/lush_credits_offer.dart';
 import 'package:lush_app/services/user_provider.dart';
 
 import 'package:lush_app/widgets/credits_offer_widget.dart';
 import 'package:lush_app/widgets/custom_background.dart';
 import 'package:lush_app/widgets/lush_tokens_widget.dart';
 
-import 'package:provider/provider.dart';
-
 class ShopScreen extends StatelessWidget {
   const ShopScreen({super.key});
 
-  _onBasicOfferButtonPressed(BuildContext context, LushCreditsOffer offer) {}
+  _onBasicOfferButtonPressed(BuildContext context, ShopOfferModel offer) {}
 
-  _onCreativeOfferButtonPressed(BuildContext context, LushCreditsOffer offer) {}
+  _onCreativeOfferButtonPressed(BuildContext context, ShopOfferModel offer) {}
 
-  _onMagicOfferButtonPressed(BuildContext context, LushCreditsOffer offer) {
+  _onMagicOfferButtonPressed(BuildContext context, ShopOfferModel offer) {
     try {
-      LushUser currentUser =
+      UserModel currentUser =
           Provider.of<UserProvider>(context, listen: false).user!;
 
-      currentUser.addLushTokens(offer.offerAmount);
-      currentUser.redeemOffer(offer);
+      currentUser.purchaseInfo.addLushTokens(offer.offerAmount);
+      currentUser.purchaseInfo.redeemOffer(offer);
 
       Provider.of<UserProvider>(context, listen: false).setUser(currentUser);
 
-      FirebaseHelper.storeUserData(currentUser);
+      FirebaseHelper.userHelper.storeUserData(currentUser);
     } catch (e) {
       print('Errore durante l acquisto dell offerta: $e');
     }
@@ -38,12 +38,12 @@ class ShopScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    LushUser currentUser =
+    UserModel currentUser =
         Provider.of<UserProvider>(context, listen: false).user!;
 
     return CustomBackground(
-      child: StreamBuilder<List<LushCreditsOffer>>(
-        stream: FirebaseHelper.getCreditsOffersStream(),
+      child: StreamBuilder<List<ShopOfferModel>>(
+        stream: FirebaseHelper.offersHelper.getCreditsOffersStream(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -52,18 +52,18 @@ class ShopScreen extends StatelessWidget {
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text('Nessuna offerta disponibile'));
           } else {
-            List<LushCreditsOffer> magicOffers = [];
-            List<LushCreditsOffer> creativeOffers = [];
-            List<LushCreditsOffer> basicOffers = [];
+            List<ShopOfferModel> magicOffers = [];
+            List<ShopOfferModel> creativeOffers = [];
+            List<ShopOfferModel> basicOffers = [];
             for (int i = 0; i < snapshot.data!.length; i++) {
               switch (snapshot.data![i].offerType) {
-                case CreditsOfferType.magic:
+                case ShopOfferType.magic:
                   magicOffers.add(snapshot.data![i]);
                   break;
-                case CreditsOfferType.creative:
+                case ShopOfferType.creative:
                   creativeOffers.add(snapshot.data![i]);
                   break;
-                case CreditsOfferType.basic:
+                case ShopOfferType.basic:
                   basicOffers.add(snapshot.data![i]);
                   break;
               }
@@ -92,7 +92,8 @@ class ShopScreen extends StatelessWidget {
                 ...creativeOffers.map((offer) => CreditsOfferWidget.creative(
                       offer: offer,
                       padding: const EdgeInsets.only(bottom: 16.0),
-                      onPressed: currentUser.reedemedOffers!.contains(offer.id)
+                      onPressed: currentUser.purchaseInfo.redeemedOffers
+                              .contains(offer.id)
                           ? null
                           : () => _onCreativeOfferButtonPressed(context, offer),
                     )),
@@ -105,7 +106,7 @@ class ShopScreen extends StatelessWidget {
                           padding: const EdgeInsets.only(right: 16.0),
                           child: CreditsOfferWidget.basic(
                             offer: offer,
-                            onPressed: currentUser.reedemedOffers!
+                            onPressed: currentUser.purchaseInfo.redeemedOffers
                                     .contains(offer.id)
                                 ? null
                                 : () =>
@@ -118,7 +119,8 @@ class ShopScreen extends StatelessWidget {
                 ),
                 ...magicOffers.map((offer) => CreditsOfferWidget.magic(
                       offer: offer,
-                      onPressed: currentUser.reedemedOffers!.contains(offer.id)
+                      onPressed: currentUser.purchaseInfo.redeemedOffers
+                              .contains(offer.id)
                           ? null
                           : () => _onMagicOfferButtonPressed(context, offer),
                     )),

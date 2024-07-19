@@ -6,20 +6,37 @@ import 'package:lush_app/constants/colors.dart';
 import 'package:lush_app/constants/images.dart';
 
 import 'package:lush_app/models/chat_model.dart';
-import 'package:lush_app/models/direct_message.dart';
+import 'package:lush_app/models/message_model.dart';
 
 import 'package:lush_app/services/chat_provider.dart';
 import 'package:lush_app/services/firebase_helper.dart';
 
+import 'package:lush_app/widgets/custom_icon_button.dart';
 import 'package:lush_app/widgets/custom_background.dart';
 import 'package:lush_app/widgets/direct_message_chat_widget.dart';
 import 'package:lush_app/widgets/lush_tokens_widget.dart';
 import 'package:lush_app/widgets/send_message_widget.dart';
 
-class DirectScreen extends StatelessWidget {
-  DirectScreen({super.key});
+class DirectScreen extends StatefulWidget {
+  const DirectScreen({super.key});
 
+  @override
+  State<DirectScreen> createState() => _DirectScreenState();
+}
+
+class _DirectScreenState extends State<DirectScreen> {
   final TextEditingController _messageController = TextEditingController();
+
+  final ScrollController _chatScrollController = ScrollController();
+
+  MessageModel? repliedMessage;
+
+  void _updateReplyMessage(MessageModel message) {
+    print('Updating reply message: ${message.id}');
+    setState(() {
+      repliedMessage = message;
+    });
+  }
 
   Widget _buildAppBar() {
     return const Padding(
@@ -92,18 +109,20 @@ class DirectScreen extends StatelessWidget {
                   Column(
                     children: [
                       Text(
-                        chat.participantIds[1],
+                        chat.userIds[1],
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text(
-                        chat.lastMessageTimestamp.toString(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                        ),
-                      ),
+                      chat.lastMessage != null
+                          ? Text(
+                              chat.lastMessage!.timestamp.toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                              ),
+                            )
+                          : Container(),
                     ],
                   ),
                 ],
@@ -148,21 +167,54 @@ class DirectScreen extends StatelessWidget {
           children: [
             _buildAppBar(),
             _buildContactBar(context, chat),
-            const DirectMessageChatWidget(),
+            DirectMessageChatWidget(
+              scrollController: _chatScrollController,
+              onReply: _updateReplyMessage,
+            ),
+            repliedMessage != null
+                ? Container(
+                    color: Colors.red,
+                    child: Row(
+                      children: [
+                        Column(
+                          children: [
+                            Text(
+                              repliedMessage!.senderId,
+                            ),
+                            Text(
+                              repliedMessage!.text,
+                            ),
+                          ],
+                        ),
+                        CustomIconButton.small(
+                          icon: Icons.cancel_outlined,
+                          onPressed: () {
+                            setState(() {
+                              repliedMessage = null;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  )
+                : Container(),
             SendMessageWidget(
               controller: _messageController,
               onMessageSent: (message) async {
-                await FirebaseHelper.sendMessage(
-                  DirectMessage(
+                await FirebaseHelper.chatsHelper.sendMessage(
+                  chat.id,
+                  MessageModel(
                     id: 'ejbfqwbfjqwbdqwd',
                     chatId: chat.id,
                     senderId: 'currentUserId',
                     text: message,
                     timestamp: DateTime.now(),
-                    isDelivered: true,
-                    isRead: true,
+                    replyToMessageId: repliedMessage?.id,
                   ),
                 );
+                setState(() {
+                  repliedMessage = null;
+                });
               },
             ),
           ],

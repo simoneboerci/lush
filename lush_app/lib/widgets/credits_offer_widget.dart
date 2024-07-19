@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:lush_app/constants/colors.dart';
 import 'package:lush_app/constants/images.dart';
 
-import 'package:lush_app/models/lush_credits_offer.dart';
+import 'package:lush_app/models/shop_offer_model.dart';
 
 class CreditsOfferWidget extends StatelessWidget {
   const CreditsOfferWidget.magic({
@@ -24,7 +24,7 @@ class CreditsOfferWidget extends StatelessWidget {
     this.priceFontSize = 30.0,
     this.imageSize = 27.0,
     this.image = cPinkTongue,
-    this.offerType = CreditsOfferType.magic,
+    this.offerType = ShopOfferType.magic,
     this.disabledBackgroundColor = cSurfaceColor,
   });
 
@@ -47,7 +47,7 @@ class CreditsOfferWidget extends StatelessWidget {
     this.priceFontSize = 24.0,
     this.imageSize = 27.0,
     this.image = cPinkTongue,
-    this.offerType = CreditsOfferType.creative,
+    this.offerType = ShopOfferType.creative,
     this.disabledBackgroundColor,
   });
 
@@ -70,11 +70,11 @@ class CreditsOfferWidget extends StatelessWidget {
     this.priceFontSize = 24.0,
     this.imageSize = 27.0,
     this.image = cPinkTongue,
-    this.offerType = CreditsOfferType.basic,
+    this.offerType = ShopOfferType.basic,
     this.disabledBackgroundColor,
   });
 
-  final LushCreditsOffer offer;
+  final ShopOfferModel offer;
   final EdgeInsets padding;
   final Function()? onPressed;
   final Color? backgroundColor;
@@ -90,7 +90,7 @@ class CreditsOfferWidget extends StatelessWidget {
   final double priceFontSize;
   final double imageSize;
   final AssetImage image;
-  final CreditsOfferType offerType;
+  final ShopOfferType offerType;
   final Color? disabledBackgroundColor;
 
   String _getPriceString() {
@@ -112,11 +112,11 @@ class CreditsOfferWidget extends StatelessWidget {
 
   Widget _buildSelectedOfferBasedOnType(BuildContext context) {
     switch (offerType) {
-      case CreditsOfferType.magic:
+      case ShopOfferType.magic:
         return _buildMagicOfferWidget();
-      case CreditsOfferType.creative:
+      case ShopOfferType.creative:
         return _buildCreativeOfferWidget();
-      case CreditsOfferType.basic:
+      case ShopOfferType.basic:
         return _buildBasicOfferWidget(context);
     }
   }

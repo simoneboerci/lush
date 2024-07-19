@@ -1,21 +1,40 @@
 import 'package:flutter/material.dart';
+
+import 'package:provider/provider.dart';
+
+import 'package:lush_app/constants/colors.dart';
+
 import 'package:lush_app/models/chat_model.dart';
+import 'package:lush_app/models/message_model.dart';
 
-import 'package:lush_app/models/direct_message.dart';
 import 'package:lush_app/services/chat_provider.dart';
-
 import 'package:lush_app/services/firebase_helper.dart';
 
+import 'package:lush_app/widgets/action_item_direct_overlay_widget.dart';
 import 'package:lush_app/widgets/message_bubble_widget.dart';
-import 'package:provider/provider.dart';
 
 class DirectMessageChatWidget extends StatelessWidget {
   const DirectMessageChatWidget({
     super.key,
-    //required this.chat,
+    required this.scrollController,
+    this.scrollAnimationDuration = 300,
+    this.onReply,
   });
 
-  //final ChatModel chat;
+  final ScrollController scrollController;
+  final int scrollAnimationDuration;
+  final Function(MessageModel message)? onReply;
+
+  void _scrollToMessage(String messageId, List<MessageModel> messages) {
+    final index = messages.indexWhere((msg) => msg.id == messageId);
+    if (index != -1) {
+      scrollController.animateTo(
+        index * 100.0, // Assumendo un'altezza fissa per ogni messaggio
+        duration: Duration(milliseconds: scrollAnimationDuration),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +42,8 @@ class DirectMessageChatWidget extends StatelessWidget {
         Provider.of<ChatProvider>(context, listen: false).chat!;
 
     return Flexible(
-      child: StreamBuilder<List<DirectMessage>>(
-        stream: FirebaseHelper.getMessagesFromChat(chat.id),
+      child: StreamBuilder<List<MessageModel>>(
+        stream: FirebaseHelper.chatsHelper.getMessagesFromChat(chat.id),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -48,6 +67,7 @@ class DirectMessageChatWidget extends StatelessWidget {
 
           return ListView.builder(
             reverse: true,
+            controller: scrollController,
             itemCount: messages.length,
             itemBuilder: (context, index) {
               final message = messages[index];
@@ -62,9 +82,51 @@ class DirectMessageChatWidget extends StatelessWidget {
               return Padding(
                 padding: padding,
                 child: MessageBubbleWidget(
-                    message: message, isMe: message.senderId == 'currentUserId'
-                    //FirebaseHelper.getCurrentUserUid,
+                  message: message, isMe: message.senderId == 'currentUserId',
+                  onReplyTap: (replyMessageId) =>
+                      _scrollToMessage(replyMessageId, messages),
+                  //TODO:FirebaseHelper.getCurrentUserUid,
+                  onLongPressActions: [
+                    ActionItemDirectOverlayWidget(
+                      label: 'Aggiungi ai preferiti',
+                      icon: Icons.bookmark_border,
+                      onTap: () {},
                     ),
+                    ActionItemDirectOverlayWidget(
+                      label: 'Rispondi',
+                      icon: Icons.replay,
+                      onTap: () {
+                        print('Reply action tapped');
+                        if (onReply != null) {
+                          onReply!(message);
+                        }
+                      },
+                    ),
+                    ActionItemDirectOverlayWidget(
+                      label: 'Copia',
+                      icon: Icons.content_copy,
+                      onTap: () {},
+                    ),
+                    ActionItemDirectOverlayWidget(
+                      label: 'Fissa',
+                      icon: Icons.push_pin_outlined,
+                      onTap: () {},
+                    ),
+                    ActionItemDirectOverlayWidget(
+                      label: 'Segnala',
+                      icon: Icons.flag_outlined,
+                      onTap: () {},
+                    ),
+                    ActionItemDirectOverlayWidget(
+                      label: 'Elimina',
+                      icon: Icons.delete_outlined,
+                      iconColor: cPrimaryColor,
+                      textColor: cPrimaryColor,
+                      onTap: () {},
+                      addDivider: false,
+                    ),
+                  ],
+                ),
               );
             },
           );

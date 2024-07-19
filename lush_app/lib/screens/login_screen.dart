@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+
+import 'package:provider/provider.dart';
+
 import 'package:lush_app/constants/colors.dart';
-import 'package:lush_app/models/lush_user.dart';
+
+import 'package:lush_app/models/user_model.dart';
+
 import 'package:lush_app/services/firebase_helper.dart';
 import 'package:lush_app/services/user_provider.dart';
+
 import 'package:lush_app/widgets/custom_background.dart';
 import 'package:lush_app/widgets/registration_header.dart';
-
 import 'package:lush_app/widgets/custom_form.dart';
 import 'package:lush_app/widgets/custom_elevated_button.dart';
 import 'package:lush_app/widgets/custom_text_field.dart';
-import 'package:provider/provider.dart';
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
@@ -19,26 +23,26 @@ class LoginScreen extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  Future<LushUser?> _login() async {
+  Future<UserModel?> _login() async {
     if (_formKey.currentState!.validate()) {
       String email = _emailController.text;
       String password = _passwordController.text;
 
-      LushUser? loggedUser =
-          await FirebaseHelper.loginWithEmailAndPassword(email, password);
+      UserModel? loggedUser = await FirebaseHelper.loginHelper
+          .loginWithEmailAndPassword(email, password);
       if (loggedUser != null) {
-        return FirebaseHelper.getUserWithUid(loggedUser.userId);
+        return FirebaseHelper.userHelper.getUserWithUid(loggedUser.id);
       }
     }
 
     return null;
   }
 
-  Future<LushUser?> _loginWithGoogle() async {
-    LushUser? loggedUser = await FirebaseHelper.loginWithGoogle();
+  Future<UserModel?> _loginWithGoogle() async {
+    UserModel? loggedUser = await FirebaseHelper.loginHelper.loginWithGoogle();
 
     if (loggedUser != null) {
-      return await FirebaseHelper.getUserWithUid(loggedUser.userId);
+      return await FirebaseHelper.userHelper.getUserWithUid(loggedUser.id);
     }
 
     return null;
@@ -60,9 +64,9 @@ class LoginScreen extends StatelessWidget {
     });
   }
 
-  void _completeLogin(BuildContext context, LushUser user) {
+  void _completeLogin(BuildContext context, UserModel user) {
     Provider.of<UserProvider>(context, listen: false).setUser(user);
-    Navigator.pushReplacementNamed(context, '/shop_screen');
+    Navigator.pushReplacementNamed(context, '/chats_screen');
   }
 
   @override

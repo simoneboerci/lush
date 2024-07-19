@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:lush_app/models/lush_user.dart';
+
+import 'package:provider/provider.dart';
+
+import 'package:lush_app/models/user_model.dart';
+
 import 'package:lush_app/services/firebase_helper.dart';
 import 'package:lush_app/services/user_provider.dart';
 
 import 'package:lush_app/widgets/registration_header.dart';
-
 import 'package:lush_app/widgets/custom_background.dart';
 import 'package:lush_app/widgets/custom_elevated_button.dart';
 import 'package:lush_app/widgets/custom_form.dart';
 import 'package:lush_app/widgets/custom_text_field.dart';
-import 'package:provider/provider.dart';
 
 class RegistrationScreen extends StatelessWidget {
   RegistrationScreen({super.key});
@@ -23,23 +25,24 @@ class RegistrationScreen extends StatelessWidget {
   final TextEditingController _passowrdConfirmationController =
       TextEditingController();
 
-  Future<LushUser?> _completeRegistration() async {
+  Future<UserModel?> _completeRegistration() async {
     if (_formKey.currentState!.validate()) {
       try {
         String email = _emailController.text;
         String password = _passwordController.text;
 
-        LushUser? loggedUser =
-            await FirebaseHelper.registerWithEmailAndPassword(email, password);
+        UserModel? loggedUser = await FirebaseHelper.loginHelper
+            .registerWithEmailAndPassword(email, password);
 
         if (loggedUser != null) {
-          LushUser updatedUser = LushUser.copyWith(
-            user: loggedUser,
-            name: _nameController.text,
-            username: _usernameController.text,
+          UserModel updatedUser = loggedUser.copyWith(
+            personalInfo:
+                loggedUser.personalInfo.copyWith(name: _nameController.text),
+            chatInfo: loggedUser.chatInfo
+                .copyWith(username: _usernameController.text),
           );
 
-          await FirebaseHelper.storeUserData(updatedUser);
+          await FirebaseHelper.userHelper.storeUserData(updatedUser);
 
           return updatedUser;
         }
@@ -61,14 +64,14 @@ class RegistrationScreen extends StatelessWidget {
   }
 
   void _updateTextFieldTextsBasedOnUser(BuildContext context) {
-    LushUser? currentUser =
+    UserModel? currentUser =
         Provider.of<UserProvider>(context, listen: false).user;
 
     if (currentUser != null) {
-      _usernameController.text = currentUser.username ?? '';
-      _nameController.text = currentUser.name ?? '';
-      _emailController.text = currentUser.email ?? '';
-      _passwordController.text = currentUser.password ?? '';
+      _usernameController.text = currentUser.chatInfo.username ?? '';
+      _nameController.text = currentUser.personalInfo.name ?? '';
+      _emailController.text = currentUser.contactInfo.email ?? '';
+      _passwordController.text = currentUser.contactInfo.password ?? '';
     }
   }
 

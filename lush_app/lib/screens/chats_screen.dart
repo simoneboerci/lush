@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+
+import 'package:provider/provider.dart';
+
 import 'package:lush_app/constants/images.dart';
 
 import 'package:lush_app/models/chat_model.dart';
-import 'package:lush_app/services/chat_provider.dart';
 
+import 'package:lush_app/services/chat_provider.dart';
 import 'package:lush_app/services/firebase_helper.dart';
 
 import 'package:lush_app/widgets/custom_background.dart';
 import 'package:lush_app/widgets/custom_text_field.dart';
-import 'package:provider/provider.dart';
 
 class ChatsScreen extends StatelessWidget {
   ChatsScreen({super.key});
@@ -24,7 +26,7 @@ class ChatsScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           StreamBuilder<List<ChatModel>>(
-              stream: FirebaseHelper.getUserChats('currentUserId'),
+              stream: FirebaseHelper.chatsHelper.getUserChats('currentUserId'),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const CircularProgressIndicator();
@@ -62,19 +64,21 @@ class ChatsScreen extends StatelessWidget {
                         backgroundImage: cLushTokenIcon,
                       ),
                       title: Text(
-                        chats[index].participantIds[1],
+                        chats[index].userIds[1],
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      subtitle: Text(chats[index].lastMessage),
+                      subtitle: chats[index].lastMessage != null
+                          ? Text(chats[index].lastMessage!.text)
+                          : Container(),
                       subtitleTextStyle: const TextStyle(
                         color: Colors.white,
                       ),
                       trailing: Text(
-                        chats[index].lastMessageTimestamp != null
-                            ? '${chats[index].lastMessageTimestamp?.hour.toString().padLeft(2, '0')}:${chats[index].lastMessageTimestamp?.hour.toString().padLeft(2, '0')}'
+                        chats[index].lastMessage != null
+                            ? '${chats[index].lastMessage!.timestamp.hour.toString().padLeft(2, '0')}:${chats[index].lastMessage!.timestamp.hour.toString().padLeft(2, '0')}'
                             : '',
                         style: const TextStyle(
                           color: Colors.white,

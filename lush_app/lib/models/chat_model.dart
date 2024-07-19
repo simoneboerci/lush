@@ -1,51 +1,38 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:lush_app/models/message_model.dart';
 
 class ChatModel {
   final String id;
-  final List<String> participantIds;
-  final String lastMessage;
-  final DateTime? lastMessageTimestamp;
-  final bool isGroup;
-  final String? groupName;
-  final String? groupImageUrl;
-  final Map<String, int> unreadCounts;
+  final List<String> userIds;
+  final List<MessageModel> messages;
+  final MessageModel? lastMessage;
+
+  static const String idLabel = 'id';
+  static const String userIdsLabel = 'user_ids';
+  static const String messagesLabel = 'messages';
+  static const String lastMessageLabel = 'last_message';
 
   ChatModel({
     required this.id,
-    required this.participantIds,
-    required this.lastMessage,
-    required this.lastMessageTimestamp,
-    required this.isGroup,
-    this.groupName,
-    this.groupImageUrl,
-    required this.unreadCounts,
+    required this.userIds,
+    this.messages = const [],
+    this.lastMessage,
   });
 
   factory ChatModel.fromMap(Map<String, dynamic> map) {
     return ChatModel(
-      id: map['id'] ?? '',
-      participantIds: List<String>.from(map['participant_ids']),
-      lastMessage: map['last_message'] ?? '',
-      lastMessageTimestamp: map['last_message_timestamp'] != ''
-          ? (map['last_message_timestamp'] as Timestamp).toDate()
-          : null,
-      isGroup: map['is_group'] ?? false,
-      groupName: map['group_name'] ?? '',
-      groupImageUrl: map['group_image_url'] ?? '',
-      unreadCounts: Map<String, int>.from(map['unread_counts']),
+      id: map[idLabel] as String,
+      userIds: List<String>.from(map[userIdsLabel]),
+      messages: List<MessageModel>.from(map[messagesLabel]),
+      lastMessage: map[lastMessageLabel] as MessageModel?,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
-      'participant_ids': participantIds,
-      'last_message': lastMessage,
-      'last_message_timestamp': Timestamp.fromDate(lastMessageTimestamp!),
-      'is_group': isGroup,
-      'group_name': groupName,
-      'group_image_url': groupImageUrl,
-      'unread_counts': unreadCounts,
+      idLabel: id,
+      userIdsLabel: userIds,
+      messagesLabel: messages,
+      lastMessageLabel: lastMessage
     };
   }
 }

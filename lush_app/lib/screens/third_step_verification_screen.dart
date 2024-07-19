@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:lush_app/constants/images.dart';
-import 'package:lush_app/models/lush_user.dart';
+
+import 'package:lush_app/models/user_model.dart';
+
 import 'package:lush_app/services/firebase_helper.dart';
 import 'package:lush_app/services/user_provider.dart';
 
@@ -10,7 +13,6 @@ import 'package:lush_app/widgets/custom_elevated_button.dart';
 import 'package:lush_app/widgets/custom_form.dart';
 import 'package:lush_app/widgets/custom_text_field.dart';
 import 'package:lush_app/widgets/registration_header.dart';
-import 'package:provider/provider.dart';
 
 class ThirdStepVerificationScreen extends StatelessWidget {
   ThirdStepVerificationScreen({super.key});
@@ -123,15 +125,16 @@ class ThirdStepVerificationScreen extends StatelessWidget {
     return expectedCheckChar == formattedCode[15];
   }
 
-  Future<LushUser?> _confirmThirdStepVerification(LushUser loggedUser) async {
+  Future<UserModel?> _confirmThirdStepVerification(UserModel loggedUser) async {
     if (_formKey.currentState!.validate()) {
       try {
-        LushUser updatedUser = LushUser.copyWith(
-          user: loggedUser,
-          fiscalCode: _fiscalCodeController.text.toUpperCase(),
+        UserModel updatedUser = loggedUser.copyWith(
+          personalInfo: loggedUser.personalInfo.copyWith(
+            fiscalCode: _fiscalCodeController.text.toUpperCase(),
+          ),
         );
 
-        await FirebaseHelper.storeUserData(updatedUser);
+        await FirebaseHelper.userHelper.storeUserData(updatedUser);
 
         return updatedUser;
       } catch (e) {
@@ -155,11 +158,11 @@ class ThirdStepVerificationScreen extends StatelessWidget {
   }
 
   void _updateTextFieldTextsBasedOnUser(BuildContext context) {
-    LushUser? currentUser =
+    UserModel? currentUser =
         Provider.of<UserProvider>(context, listen: false).user;
 
     if (currentUser != null) {
-      _fiscalCodeController.text = currentUser.fiscalCode ?? '';
+      _fiscalCodeController.text = currentUser.personalInfo.fiscalCode ?? '';
     }
   }
 

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:lush_app/constants/colors.dart';
 
 import 'package:provider/provider.dart';
 
-import '../services/user_provider.dart';
+import 'package:lush_app/constants/colors.dart';
+
+import 'package:lush_app/services/user_provider.dart';
 import 'package:lush_app/services/firebase_helper.dart';
 
 import 'package:lush_app/widgets/registration_header.dart';
@@ -12,7 +13,7 @@ import 'package:lush_app/widgets/custom_form.dart';
 import 'package:lush_app/widgets/custom_elevated_button.dart';
 import 'package:lush_app/widgets/custom_text_field.dart';
 
-import '../models/lush_user.dart';
+import '../models/user_model.dart';
 
 class FastRegistrationScreen extends StatelessWidget {
   FastRegistrationScreen({super.key});
@@ -21,17 +22,18 @@ class FastRegistrationScreen extends StatelessWidget {
 
   final TextEditingController _usernameController = TextEditingController();
 
-  Future<LushUser?> _loginAnonimously() async {
+  Future<UserModel?> _loginAnonimously() async {
     if (_formKey.currentState!.validate()) {
-      return await FirebaseHelper.loginAnonimously(_usernameController.text);
+      return await FirebaseHelper.loginHelper
+          .loginAnonimously(_usernameController.text);
     }
     return null;
   }
 
-  Future<LushUser?> _loginWithGoogle() async {
-    LushUser? loggedUser = await FirebaseHelper.loginWithGoogle();
+  Future<UserModel?> _loginWithGoogle() async {
+    UserModel? loggedUser = await FirebaseHelper.loginHelper.loginWithGoogle();
 
-    return await FirebaseHelper.getUserWithUid(loggedUser!.userId);
+    return await FirebaseHelper.userHelper.getUserWithUid(loggedUser!.id);
   }
 
   void _onGoogleButtonPressed(BuildContext context) {
@@ -50,7 +52,7 @@ class FastRegistrationScreen extends StatelessWidget {
     });
   }
 
-  void _completeRegistration(BuildContext context, LushUser user) {
+  void _completeRegistration(BuildContext context, UserModel user) {
     Navigator.pushNamed(context, '/complete_registration_screen');
     Provider.of<UserProvider>(context, listen: false).setUser(user);
   }

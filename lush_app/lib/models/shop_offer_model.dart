@@ -1,22 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-enum CreditsOfferType {
+enum ShopOfferType {
   magic,
   creative,
   basic,
 }
 
-class LushCreditsOffer {
+class ShopOfferModel {
   final String id;
   final String label;
   final DateTime startDate;
   final DateTime? endDate;
   final double fullPrice;
   final double? discountedPrice;
-  final CreditsOfferType offerType;
+  final ShopOfferType offerType;
   final int offerAmount;
 
-  LushCreditsOffer({
+  ShopOfferModel({
     required this.id,
     this.label = '',
     required this.startDate,
@@ -27,8 +27,8 @@ class LushCreditsOffer {
     required this.offerAmount,
   });
 
-  factory LushCreditsOffer.fromMap(Map<String, dynamic> map) {
-    return LushCreditsOffer(
+  factory ShopOfferModel.fromMap(Map<String, dynamic> map) {
+    return ShopOfferModel(
       id: map['offer_id'] ?? '',
       label: map['label'] ?? '',
       startDate: (map['start_date'] as Timestamp).toDate(),
@@ -44,16 +44,16 @@ class LushCreditsOffer {
     );
   }
 
-  static CreditsOfferType _parseOfferType(String? type) {
+  static ShopOfferType _parseOfferType(String? type) {
     switch (type) {
       case 'magic':
-        return CreditsOfferType.magic;
+        return ShopOfferType.magic;
       case 'creative':
-        return CreditsOfferType.creative;
+        return ShopOfferType.creative;
       case 'basic':
-        return CreditsOfferType.basic;
+        return ShopOfferType.basic;
       default:
-        return CreditsOfferType.basic;
+        return ShopOfferType.basic;
     }
   }
 }
