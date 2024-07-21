@@ -170,9 +170,7 @@ class CustomTextField extends StatelessWidget {
           decoration: InputDecoration(
             prefixIcon: prefixIcon,
             prefixIconColor: prefixIconColor,
-            hintStyle: TextStyle(
-              color: hintTextColor,
-            ),
+            hintStyle: TextStyle(color: hintTextColor),
             contentPadding: contentPadding,
             fillColor: fillColor,
             hintText: hintText,

@@ -1,4 +1,7 @@
+import 'package:flutter/foundation.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:equatable/equatable.dart';
 
 enum ShopOfferType {
   magic,
@@ -6,7 +9,19 @@ enum ShopOfferType {
   basic,
 }
 
-class ShopOfferModel {
+enum ShopOfferField {
+  id,
+  label,
+  startDate,
+  endDate,
+  fullPrice,
+  discountedPrice,
+  offerType,
+  offerAmount,
+}
+
+@immutable
+class ShopOfferModel extends Equatable {
   final String id;
   final String label;
   final DateTime startDate;
@@ -16,7 +31,7 @@ class ShopOfferModel {
   final ShopOfferType offerType;
   final int offerAmount;
 
-  ShopOfferModel({
+  const ShopOfferModel({
     required this.id,
     this.label = '',
     required this.startDate,
@@ -25,35 +40,56 @@ class ShopOfferModel {
     this.discountedPrice,
     required this.offerType,
     required this.offerAmount,
-  });
+  })  : assert(fullPrice >= 0, 'Full price must be non-negative'),
+        assert(
+            discountedPrice == null ||
+                (discountedPrice >= 0 && discountedPrice < fullPrice),
+            'Discounted price must be non-negative and less than full price'),
+        assert(offerAmount > 0, 'Offer amount must be positive');
 
   factory ShopOfferModel.fromMap(Map<String, dynamic> map) {
     return ShopOfferModel(
-      id: map['offer_id'] ?? '',
-      label: map['label'] ?? '',
-      startDate: (map['start_date'] as Timestamp).toDate(),
-      endDate: map['end_date'] != null
-          ? (map['end_date'] as Timestamp).toDate()
+      id: map[ShopOfferField.id.name] as String? ?? '',
+      label: map[ShopOfferField.label.name] as String? ?? '',
+      startDate: (map[ShopOfferField.startDate.name] as Timestamp).toDate(),
+      endDate: map[ShopOfferField.endDate.name] != null
+          ? (map[ShopOfferField.endDate.name] as Timestamp).toDate()
           : null,
-      fullPrice: (map['full_price'] as num).toDouble(),
-      discountedPrice: map['discounted_price'] != null
-          ? (map['discounted_price'] as num).toDouble()
+      fullPrice: (map[ShopOfferField.fullPrice.name] as num).toDouble(),
+      discountedPrice: map[ShopOfferField.discountedPrice.name] != null
+          ? (map[ShopOfferField.discountedPrice.name] as num).toDouble()
           : null,
-      offerType: _parseOfferType(map['offer_type']),
-      offerAmount: (map['offer_amount'] as num).toInt(),
+      offerType: ShopOfferType.values.firstWhere(
+        (e) => e.name == map[ShopOfferField.offerType.name] as String,
+        orElse: () => ShopOfferType.basic,
+      ),
+      offerAmount: (map[ShopOfferField.offerAmount.name] as num).toInt(),
     );
   }
 
-  static ShopOfferType _parseOfferType(String? type) {
-    switch (type) {
-      case 'magic':
-        return ShopOfferType.magic;
-      case 'creative':
-        return ShopOfferType.creative;
-      case 'basic':
-        return ShopOfferType.basic;
-      default:
-        return ShopOfferType.basic;
-    }
+  Map<String, dynamic> toMap() {
+    return {
+      ShopOfferField.id.name: id,
+      ShopOfferField.label.name: label,
+      ShopOfferField.startDate.name: Timestamp.fromDate(startDate),
+      ShopOfferField.endDate.name:
+          endDate != null ? Timestamp.fromDate(endDate!) : null,
+      ShopOfferField.fullPrice.name: fullPrice,
+      ShopOfferField.discountedPrice.name: discountedPrice,
+      ShopOfferField.offerType.name: offerType,
+      ShopOfferField.offerAmount.name: offerAmount,
+    };
   }
+
+  @override
+  List<Object?> get props => [
+        id,
+        label,
+        startDate,
+        endDate,
+        fullPrice,
+        discountedPrice,
+        offerType,
+        offerAmount
+      ];
 }

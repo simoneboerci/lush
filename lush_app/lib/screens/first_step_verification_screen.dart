@@ -40,7 +40,7 @@ class FirstStepVerificationScreen extends StatelessWidget {
           ),
         );
 
-        await FirebaseHelper.userHelper.storeUserData(updatedUser);
+        await FirebaseHelper().userHelper.storeUserData(updatedUser);
 
         return updatedUser;
       } catch (e) {

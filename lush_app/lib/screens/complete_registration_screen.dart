@@ -31,7 +31,8 @@ class RegistrationScreen extends StatelessWidget {
         String email = _emailController.text;
         String password = _passwordController.text;
 
-        UserModel? loggedUser = await FirebaseHelper.loginHelper
+        UserModel? loggedUser = await FirebaseHelper()
+            .loginHelper
             .registerWithEmailAndPassword(email, password);
 
         if (loggedUser != null) {
@@ -42,7 +43,7 @@ class RegistrationScreen extends StatelessWidget {
                 .copyWith(username: _usernameController.text),
           );
 
-          await FirebaseHelper.userHelper.storeUserData(updatedUser);
+          await FirebaseHelper().userHelper.storeUserData(updatedUser);
 
           return updatedUser;
         }

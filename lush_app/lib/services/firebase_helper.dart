@@ -6,30 +6,59 @@ import 'package:lush_app/services/firebase_login_helper.dart';
 import 'package:lush_app/services/firebase_offers_helper.dart';
 import 'package:lush_app/services/firebase_user_helper.dart';
 
-// Classe che conserva i moduli di gestione del database firebase
-class FirebaseHelper {
-  // Variabile di inizializzazione del database
-  static bool _isInitialized = false;
+// Interfaccia per FirebaseHelper
+abstract class IFirebaseHelper {
+  IFirebaseUserHelper get userHelper;
+  IFirebaseLoginHelper get loginHelper;
+  IFirebaseChatsHelper get chatsHelper;
+  IFirebaseOffersHelper get offersHelper;
+  Future<void> ensureInitialized();
+}
 
-  // Modulo di gestione utente tramite firebase
-  static FirebaseUserHelper userHelper = FirebaseUserHelper();
-  // Modulo di gestione login, logout, registrazione utente tramite firebase
-  static FirebaseLoginHelper loginHelper = FirebaseLoginHelper();
-  // Modulo di gestione chat e messaggi tra utenti tramite firebase
-  static FirebaseChatsHelper chatsHelper = FirebaseChatsHelper();
-  // modulo di gestione offerte e abbonamenti tramite firebase
-  static FirebaseOffersHelper offersHelper = FirebaseOffersHelper();
+// Classe che conserva i moduli di gestione del database firebase
+class FirebaseHelper implements IFirebaseHelper {
+  // Singleton
+  static final FirebaseHelper _instance = FirebaseHelper._internal();
+  factory FirebaseHelper() => _instance;
+  FirebaseHelper._internal();
+
+  // Variabile di inizializzazione del database
+  bool _isInitialized = false;
+
+  // Moduli di gestione del database
+  late final IFirebaseUserHelper _userHelper;
+  late final IFirebaseLoginHelper _loginHelper;
+  late final IFirebaseChatsHelper _chatsHelper;
+  late final IFirebaseOffersHelper _offersHelper;
+
+  // Getters dei moduli di gestione
+  @override
+  IFirebaseUserHelper get userHelper => _userHelper;
+  @override
+  IFirebaseLoginHelper get loginHelper => _loginHelper;
+  @override
+  IFirebaseChatsHelper get chatsHelper => _chatsHelper;
+  @override
+  IFirebaseOffersHelper get offersHelper => _offersHelper;
 
   // Metodo che assicura la corretta inizializzazione del database
-  static Future<void> ensureInitialized() async {
+  @override
+  Future<void> ensureInitialized() async {
     // Verifica che il database non sia già stato inizializzato
     if (!_isInitialized) {
       // Inizializza il database
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
+
       // Aggiorna la variabile di inizializzazione
       _isInitialized = true;
+
+      // Inizializza i moduli di gestione
+      _userHelper = FirebaseUserHelper();
+      _loginHelper = FirebaseLoginHelper();
+      _chatsHelper = FirebaseChatsHelper();
+      _offersHelper = FirebaseOffersHelper();
     }
   }
 }

@@ -185,7 +185,7 @@ class MessageBubbleWidget extends StatelessWidget {
   }
 
   void _showReActionsOverlay(BuildContext context, GlobalKey messageKey) {
-    ReActionsDirectOverlayWidget.showReActionsDirectOverlay(
+    ReActionsDirectOverlayWidget.show(
       context: context,
       isMe: isMe,
       messageWidget: this,

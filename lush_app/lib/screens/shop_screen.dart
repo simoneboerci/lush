@@ -30,7 +30,7 @@ class ShopScreen extends StatelessWidget {
 
       Provider.of<UserProvider>(context, listen: false).setUser(currentUser);
 
-      FirebaseHelper.userHelper.storeUserData(currentUser);
+      FirebaseHelper().userHelper.storeUserData(currentUser);
     } catch (e) {
       print('Errore durante l acquisto dell offerta: $e');
     }
@@ -43,7 +43,7 @@ class ShopScreen extends StatelessWidget {
 
     return CustomBackground(
       child: StreamBuilder<List<ShopOfferModel>>(
-        stream: FirebaseHelper.offersHelper.getCreditsOffersStream(),
+        stream: FirebaseHelper().offersHelper.getCreditsOffersStream(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

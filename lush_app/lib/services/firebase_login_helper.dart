@@ -8,87 +8,83 @@ import 'package:lush_app/models/user_chat_info_model.dart';
 import 'package:lush_app/models/user_contact_info_model.dart';
 import 'package:lush_app/models/user_personal_info_model.dart';
 import 'package:lush_app/models/user_purchase_info_model.dart';
+import 'package:lush_app/models/firebase_login_exception.dart';
+
+// Interfaccia per FirebaseLoginHelper
+abstract class IFirebaseLoginHelper {
+  Future<UserModel?> loginWithEmailAndPassword(String email, String password);
+  Future<UserModel?> registerWithEmailAndPassword(
+      String email, String password);
+  Future<UserModel?> loginWithGoogle();
+  Future<UserModel?> loginAnonymously(String username);
+}
 
 // Classe che gestisce le operazioni di login-logout e registrazione utente tramite firebase
-class FirebaseLoginHelper {
+class FirebaseLoginHelper implements IFirebaseLoginHelper {
+  final FirebaseAuth _auth;
+  final GoogleSignIn _googleSignIn;
+
+  FirebaseLoginHelper({FirebaseAuth? auth, GoogleSignIn? googleSignIn})
+      : _auth = auth ?? FirebaseAuth.instance,
+        _googleSignIn = googleSignIn ?? GoogleSignIn();
+
   // Effettua il login tramite email e password
+  @override
   Future<UserModel?> loginWithEmailAndPassword(
       String email, String password) async {
     // Assicura che firebase sia inizializzato
-    await FirebaseHelper.ensureInitialized();
+    await FirebaseHelper().ensureInitialized();
 
     try {
       // Ottieni le credenziali dell'utente tramite email e password
-      final UserCredential userCredential = await FirebaseAuth.instance
+      final UserCredential userCredential = await _auth
           .signInWithEmailAndPassword(email: email, password: password);
 
-      // Se l'utente con quelle credenziali esiste
-      if (userCredential.user != null) {
-        // Ritorna l'utente con quelle credenziali
-        return UserModel(
-          id: userCredential.user!.uid,
-          contactInfo:
-              UserContactInfoModel.fromEmailAndPassword(email, password),
-          personalInfo: UserPersonalInfoModel(),
-          chatInfo: UserChatInfoModel.online(),
-          purchaseInfo: UserPurchaseInfoModel(),
-        );
-      }
+      // Ritorna l'utente loggato
+      return _createUserModelFromCredential(userCredential,
+          email: email, password: password);
     } catch (e) {
-      print('Errore durante il login con email e password: $e');
+      throw FirebaseLoginException(
+          'Errore durante il login con email e password: $e');
     }
-
-    // Se l'operazione non va a buon fine ritorna null
-    return null;
   }
 
   // Registra un utente con email e password
+  @override
   Future<UserModel?> registerWithEmailAndPassword(
       String email, String password) async {
     // Assicura che firebase sia inizializzato
-    await FirebaseHelper.ensureInitialized();
+    await FirebaseHelper().ensureInitialized();
 
     try {
       // Genera le credenziali dell'utente tramite email e password
-      final UserCredential userCredential = await FirebaseAuth.instance
+      final UserCredential userCredential = await _auth
           .createUserWithEmailAndPassword(email: email, password: password);
 
       // Se l'utente è stato registrato correttamente invia un'email di verifica delle credenziali
-      await FirebaseAuth.instance.currentUser?.sendEmailVerification();
+      await _auth.currentUser?.sendEmailVerification();
 
-      // Se l'utente con quelle credenziali esiste
-      if (userCredential.user != null) {
-        // Ritorna l'utente con quelle credenziali
-        return UserModel(
-          id: userCredential.user!.uid,
-          contactInfo:
-              UserContactInfoModel.fromEmailAndPassword(email, password),
-          chatInfo: UserChatInfoModel.online(),
-          personalInfo: UserPersonalInfoModel(),
-          purchaseInfo: UserPurchaseInfoModel(),
-        );
-      }
+      // Ritorna l'utente loggato
+      return _createUserModelFromCredential(userCredential,
+          email: email, password: password);
     } catch (e) {
-      print('Errore durante la registrazione con email e password: $e');
+      throw FirebaseLoginException(
+          'Errore durante la registrazione con email e password: $e');
     }
-
-    // Se l'operazione non va a buon fine ritorna null
-    return null;
   }
 
   // Effettua il login tramite Google
+  @override
   Future<UserModel?> loginWithGoogle() async {
     // Assicura che firebase sia inizializzato
-    await FirebaseHelper.ensureInitialized();
+    await FirebaseHelper().ensureInitialized();
 
     try {
       // Crea un utente google
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
       // Se l'operazione non va a buon fine ritorna null
-      if (googleUser == null) {
-        return null;
-      }
+      if (googleUser == null) return null;
 
       // Otteni l'oggetto di autenticazione google
       final GoogleSignInAuthentication googleAuth =
@@ -104,52 +100,53 @@ class FirebaseLoginHelper {
       final UserCredential userCredential =
           await FirebaseAuth.instance.signInWithCredential(credential);
 
-      // Se l'utente è stato registrato correttamente
-      if (userCredential.user != null) {
-        // Ritorna l'utente
-        return UserModel(
-          id: userCredential.user!.uid,
-          chatInfo: UserChatInfoModel.online()
-              .copyWith(username: userCredential.user!.displayName),
-          purchaseInfo: UserPurchaseInfoModel(),
-          contactInfo: UserContactInfoModel(email: userCredential.user!.email),
-          personalInfo: UserPersonalInfoModel(),
-        );
-      }
+      // Ritorna l'utente loggato
+      return _createUserModelFromCredential(userCredential);
     } catch (e) {
-      print('Errore durante il login con Google: $e');
+      throw FirebaseLoginException('Errore durante il login con Google: $e');
     }
-
-    // Se l'operazione non va a buon fine ritorna null
-    return null;
   }
 
   // Esegui il login senza credenziali
-  Future<UserModel?> loginAnonimously(String username) async {
+  @override
+  Future<UserModel?> loginAnonymously(String username) async {
     // Assicura che firebase sia inizializzato
-    await FirebaseHelper.ensureInitialized();
+    await FirebaseHelper().ensureInitialized();
 
     try {
       // Effettua il login anonimo nel database
       final UserCredential userCredential =
           await FirebaseAuth.instance.signInAnonymously();
 
-      // Se la registrazione è stata effettuata correttamente
-      if (userCredential.user != null) {
-        // Ritorna l'utente creato
-        return UserModel(
-          id: userCredential.user!.uid,
-          chatInfo: UserChatInfoModel.online().copyWith(username: username),
-          contactInfo: UserContactInfoModel(),
-          personalInfo: UserPersonalInfoModel(),
-          purchaseInfo: UserPurchaseInfoModel(),
-        );
-      }
+      // Ritorna l'utente loggato
+      return _createUserModelFromCredential(userCredential, username: username);
     } catch (e) {
-      print('Errore durante il login anonimo: $e');
+      throw FirebaseLoginException('Errore durante il login anonimo: $e');
     }
+  }
 
-    // Se l'operazione non va a buon fine ritorna null
-    return null;
+  // Crea un oggetto utente a partire dalle credenziali di accesso
+  UserModel? _createUserModelFromCredential(
+    UserCredential credential, {
+    String? email,
+    String? password,
+    String? username,
+  }) {
+    // Assicurati che le credenziali siano valide
+    if (credential.user == null) return null;
+
+    // Ritorna l'oggetto utente
+    return UserModel(
+      id: credential.user!.uid,
+      contactInfo: UserContactInfoModel(
+        email: email ?? credential.user!.email,
+        password: password,
+      ),
+      personalInfo: UserPersonalInfoModel(),
+      chatInfo: UserChatInfoModel.online().copyWith(
+        username: username ?? credential.user!.displayName,
+      ),
+      purchaseInfo: UserPurchaseInfoModel(),
+    );
   }
 }

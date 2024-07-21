@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
 
+import 'package:equatable/equatable.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tuple/tuple.dart';
 
-class UserChatInfoModel {
+enum UserChatInfoField {
+  username,
+  profilePictureUrl,
+  lastSeen,
+  activeChatsIds,
+  isOnline,
+}
+
+@immutable
+class UserChatInfoModel extends Equatable {
   final String? username;
   final String? profilePictureUrl;
   final DateTime lastSeen;
   final List<String> activeChatsIds;
   final bool isOnline;
 
-  static const String usernameLabel = 'username';
-  static const String profilePictureUrlLabel = 'profile_picture_url';
-  static const String lastSeenLabel = 'last_seen';
-  static const String activeChatsIdsLabel = 'active_chats_ids';
-  static const String isOnlineLabel = 'is_online';
-
-  UserChatInfoModel({
+  const UserChatInfoModel({
     this.username,
     this.profilePictureUrl,
     required this.lastSeen,
@@ -30,25 +34,27 @@ class UserChatInfoModel {
 
   factory UserChatInfoModel.fromMap(Map<String, dynamic> map) {
     return UserChatInfoModel(
-      username: map[usernameLabel] as String?,
-      profilePictureUrl: map[profilePictureUrlLabel] as String?,
-      lastSeen: map[lastSeenLabel] != null
-          ? (map[lastSeenLabel] as Timestamp).toDate()
+      username: map[UserChatInfoField.username.name] as String?,
+      profilePictureUrl:
+          map[UserChatInfoField.profilePictureUrl.name] as String?,
+      lastSeen: map[UserChatInfoField.lastSeen.name] != null
+          ? (map[UserChatInfoField.lastSeen.name] as Timestamp).toDate()
           : DateTime.now(),
-      activeChatsIds: map[activeChatsIdsLabel] != null
-          ? List<String>.from(map[activeChatsIdsLabel] as List<dynamic>)
+      activeChatsIds: map[UserChatInfoField.activeChatsIds.name] != null
+          ? List<String>.from(
+              map[UserChatInfoField.activeChatsIds.name] as List<dynamic>)
           : const [],
-      isOnline: map[isOnlineLabel] != null ? map[isOnlineLabel] as bool : true,
+      isOnline: map[UserChatInfoField.isOnline.name] as bool? ?? true,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      usernameLabel: username,
-      profilePictureUrlLabel: profilePictureUrl,
-      lastSeenLabel: lastSeen,
-      activeChatsIdsLabel: activeChatsIds,
-      isOnlineLabel: isOnline,
+      UserChatInfoField.username.name: username,
+      UserChatInfoField.profilePictureUrl.name: profilePictureUrl,
+      UserChatInfoField.lastSeen.name: lastSeen,
+      UserChatInfoField.activeChatsIds.name: activeChatsIds,
+      UserChatInfoField.isOnline.name: isOnline,
     };
   }
 
@@ -70,13 +76,10 @@ class UserChatInfoModel {
 
   Tuple2<UserChatInfoModel, bool> addActiveChat(String chatId) {
     if (activeChatsIds.contains(chatId)) {
-      return Tuple2(
-        copyWith(),
-        false,
-      );
+      return Tuple2(this, false);
     } else {
       return Tuple2(
-        copyWith(activeChatsIds: List.from(activeChatsIds)..add(chatId)),
+        copyWith(activeChatsIds: [...activeChatsIds, chatId]),
         true,
       );
     }
@@ -85,28 +88,27 @@ class UserChatInfoModel {
   Tuple2<UserChatInfoModel, bool> removeActiveChat(String chatId) {
     if (activeChatsIds.contains(chatId)) {
       return Tuple2(
-        copyWith(activeChatsIds: List.from(activeChatsIds)..remove(chatId)),
+        copyWith(
+            activeChatsIds:
+                activeChatsIds.where((id) => id != chatId).toList()),
         true,
       );
     } else {
-      return Tuple2(
-        this,
-        false,
-      );
+      return Tuple2(this, false);
     }
   }
 
   UserChatInfoModel setOnlineStatus(bool status) {
-    if (status) {
-      return copyWith(
-        isOnline: status,
-        lastSeen: DateTime.now(),
-      );
-    } else {
-      return copyWith(isOnline: status);
-    }
+    return copyWith(
+      isOnline: status,
+      lastSeen: status ? DateTime.now() : lastSeen,
+    );
   }
 
   NetworkImage? getProfilePicture() =>
       profilePictureUrl != null ? NetworkImage(profilePictureUrl!) : null;
+
+  @override
+  List<Object?> get props =>
+      [username, profilePictureUrl, lastSeen, activeChatsIds, isOnline];
 }

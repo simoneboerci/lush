@@ -1,9 +1,13 @@
+import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
+
 import 'package:lush_app/models/user_chat_info_model.dart';
 import 'package:lush_app/models/user_contact_info_model.dart';
 import 'package:lush_app/models/user_personal_info_model.dart';
 import 'package:lush_app/models/user_purchase_info_model.dart';
 
-class UserModel {
+@immutable
+class UserModel extends Equatable {
   final String id;
   final UserPersonalInfoModel personalInfo;
   final UserContactInfoModel contactInfo;
@@ -16,7 +20,7 @@ class UserModel {
   static const String chatInfoLabel = 'chat_info';
   static const String purchaseInfoLabel = 'purchase_info';
 
-  UserModel({
+  const UserModel({
     required this.id,
     required this.personalInfo,
     required this.contactInfo,
@@ -59,4 +63,8 @@ class UserModel {
       purchaseInfo: purchaseInfo ?? this.purchaseInfo,
     );
   }
+
+  @override
+  List<Object?> get props =>
+      [id, personalInfo, contactInfo, chatInfo, purchaseInfo];
 }

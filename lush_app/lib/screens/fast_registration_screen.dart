@@ -24,16 +24,18 @@ class FastRegistrationScreen extends StatelessWidget {
 
   Future<UserModel?> _loginAnonimously() async {
     if (_formKey.currentState!.validate()) {
-      return await FirebaseHelper.loginHelper
-          .loginAnonimously(_usernameController.text);
+      return await FirebaseHelper()
+          .loginHelper
+          .loginAnonymously(_usernameController.text);
     }
     return null;
   }
 
   Future<UserModel?> _loginWithGoogle() async {
-    UserModel? loggedUser = await FirebaseHelper.loginHelper.loginWithGoogle();
+    UserModel? loggedUser =
+        await FirebaseHelper().loginHelper.loginWithGoogle();
 
-    return await FirebaseHelper.userHelper.getUserWithUid(loggedUser!.id);
+    return await FirebaseHelper().userHelper.getUserWithUid(loggedUser!.id);
   }
 
   void _onGoogleButtonPressed(BuildContext context) {

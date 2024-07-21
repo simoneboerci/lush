@@ -40,10 +40,10 @@ class _DirectScreenState extends State<DirectScreen> {
   }
 
   Future<String> _getOtherUserName(ChatModel chat) async {
-    final currentUserId = FirebaseHelper.userHelper.getCurrentUserUid!;
+    final currentUserId = FirebaseHelper().userHelper.currentUserUid!;
     final otherUserId = chat.userIds.firstWhere((id) => id != currentUserId);
     final otherUser =
-        await FirebaseHelper.userHelper.getUserWithUid(otherUserId);
+        await FirebaseHelper().userHelper.getUserWithUid(otherUserId);
     return otherUser?.chatInfo.username ?? 'Utente sconosciuto';
   }
 
@@ -71,7 +71,7 @@ class _DirectScreenState extends State<DirectScreen> {
   }
 
   Widget _buildContactBar(BuildContext context, ChatModel chat) {
-    final currentUserId = FirebaseHelper.userHelper.getCurrentUserUid;
+    final currentUserId = FirebaseHelper().userHelper.currentUserUid;
     final List<UserModel> participants =
         Provider.of<ChatProvider>(context, listen: false).participants;
     return Padding(
@@ -132,7 +132,7 @@ class _DirectScreenState extends State<DirectScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      chat.lastMessage != null
+                      chat.lastMessageId != null
                           ? Text(
                               '${participants.firstWhere((user) => user.id != currentUserId).chatInfo.lastSeen.hour.toString().padLeft(2, '0')}:${participants.firstWhere((user) => user.id != currentUserId).chatInfo.lastSeen.minute.toString().padLeft(2, '0')}',
                               style: const TextStyle(
@@ -218,17 +218,17 @@ class _DirectScreenState extends State<DirectScreen> {
             SendMessageWidget(
               controller: _messageController,
               onMessageSent: (message) async {
-                await FirebaseHelper.chatsHelper.sendMessage(
-                  chat.id,
-                  MessageModel(
-                    id: '',
-                    chatId: chat.id,
-                    senderId: FirebaseHelper.userHelper.getCurrentUserUid!,
-                    text: message,
-                    timestamp: DateTime.now(),
-                    replyToMessageId: repliedMessage?.id,
-                  ),
-                );
+                await FirebaseHelper().chatsHelper.sendMessage(
+                      chat.id,
+                      MessageModel(
+                        id: '',
+                        chatId: chat.id,
+                        senderId: FirebaseHelper().userHelper.currentUserUid!,
+                        text: message,
+                        timestamp: DateTime.now(),
+                        replyToMessageId: repliedMessage?.id,
+                      ),
+                    );
                 setState(() {
                   repliedMessage = null;
                 });

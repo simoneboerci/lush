@@ -1,13 +1,20 @@
-class UserContactInfoModel {
+import 'package:flutter/foundation.dart';
+
+import 'package:equatable/equatable.dart';
+
+enum UserContactInfoField {
+  email,
+  password,
+  phoneNumber,
+}
+
+@immutable
+class UserContactInfoModel extends Equatable {
   final String? email;
   final String? password;
   final String? phoneNumber;
 
-  static const emailLabel = 'email';
-  static const passwordLabel = 'password';
-  static const phoneNumberLabel = 'phone_number';
-
-  UserContactInfoModel({
+  const UserContactInfoModel({
     this.email,
     this.password,
     this.phoneNumber,
@@ -23,17 +30,17 @@ class UserContactInfoModel {
 
   factory UserContactInfoModel.fromMap(Map<String, dynamic> map) {
     return UserContactInfoModel(
-      email: map[emailLabel] as String?,
-      password: map[passwordLabel] as String?,
-      phoneNumber: map[phoneNumberLabel] as String?,
+      email: map[UserContactInfoField.email.name] as String?,
+      password: map[UserContactInfoField.password.name] as String?,
+      phoneNumber: map[UserContactInfoField.phoneNumber.name] as String?,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      emailLabel: email,
-      passwordLabel: password,
-      phoneNumberLabel: phoneNumber,
+      UserContactInfoField.email.name: email,
+      UserContactInfoField.password.name: password,
+      UserContactInfoField.phoneNumber.name: phoneNumber,
     };
   }
 
@@ -48,4 +55,7 @@ class UserContactInfoModel {
       phoneNumber: phoneNumber ?? this.phoneNumber,
     );
   }
+
+  @override
+  List<Object?> get props => [email, password, phoneNumber];
 }

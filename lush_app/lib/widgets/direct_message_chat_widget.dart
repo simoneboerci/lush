@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
+
 import 'package:lush_app/constants/colors.dart';
-import 'package:lush_app/models/chat_model.dart';
-import 'package:lush_app/models/message_model.dart';
+
 import 'package:lush_app/services/chat_provider.dart';
 import 'package:lush_app/services/firebase_helper.dart';
+
+import 'package:lush_app/models/chat_model.dart';
+import 'package:lush_app/models/message_model.dart';
+
 import 'package:lush_app/widgets/action_item_direct_overlay_widget.dart';
 import 'package:lush_app/widgets/message_bubble_widget.dart';
 
@@ -27,7 +32,7 @@ class DirectMessageChatWidget extends StatelessWidget {
 
     return Flexible(
       child: StreamBuilder<List<MessageModel>>(
-        stream: FirebaseHelper.chatsHelper.getMessagesFromChat(chat.id),
+        stream: FirebaseHelper().chatsHelper.getMessagesFromChat(chat.id),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(
@@ -65,7 +70,7 @@ class DirectMessageChatWidget extends StatelessWidget {
                     child: MessageBubbleWidget(
                       message: message,
                       isMe: message.senderId ==
-                          FirebaseHelper.userHelper.getCurrentUserUid,
+                          FirebaseHelper().userHelper.currentUserUid,
                       onReplyTap: (replyMessageId) =>
                           _scrollToMessage(replyMessageId, messages),
                       onLongPressActions: [

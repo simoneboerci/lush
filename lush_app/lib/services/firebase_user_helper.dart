@@ -1,38 +1,57 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:lush_app/models/user_purchase_info_model.dart';
-
-import 'package:lush_app/services/firebase_helper.dart';
 
 import 'package:lush_app/models/user_model.dart';
 import 'package:lush_app/models/user_chat_info_model.dart';
+import 'package:lush_app/models/user_purchase_info_model.dart';
+import 'package:lush_app/models/firebase_user_exception.dart';
+
+// Interfaccia per FirebaseUserHelper
+abstract class IFirebaseUserHelper {
+  String? get currentUserUid;
+  Future<UserModel?> getUserWithUid(String uid);
+  Future<void> storeUserData(UserModel user);
+  Stream<int> getTokensCountStreamFromCurrentUser();
+  Future<List<UserModel>> getUsersByQuery(String query,
+      {bool skipCurrentUser = true});
+}
 
 // Classe che gestisce la creazione, la manipolazione e la gestione degli utenti e dei loro parametri tramite firebase
-class FirebaseUserHelper {
+class FirebaseUserHelper implements IFirebaseUserHelper {
+  // Riferimento all'istanza di firebase
+  final FirebaseFirestore _firestore;
+  // Riferimento all'istanza di autenticazione di firebase
+  final FirebaseAuth _auth;
+
   // Riferimento alla collezione di utenti
   static const String firebaseUsersCollectionLabel = 'users';
 
+  // Costruttore
+  FirebaseUserHelper({FirebaseFirestore? firestore, FirebaseAuth? auth})
+      : _firestore = firestore ?? FirebaseFirestore.instance,
+        _auth = auth ?? FirebaseAuth.instance;
+
   // Ottieni l'id dell'utente corrente
-  String? getCurrentUserUid = FirebaseAuth.instance.currentUser?.uid;
+  @override
+  String? get currentUserUid => _auth.currentUser?.uid;
 
   // Ottieni l'utente tramite id
+  @override
   Future<UserModel?> getUserWithUid(String uid) async {
-    // Assicura che firebase sia inizializzato
-    await FirebaseHelper.ensureInitialized();
-
     try {
       // Ottieni l'utente con l'id selezionato
-      final usersRef = await FirebaseFirestore.instance
+      final userDoc = await _firestore
           .collection(firebaseUsersCollectionLabel)
           .doc(uid)
           .get();
       // Assicurati che l'utente esista e che contenga dei dati
-      if (usersRef.exists && usersRef.data() != null) {
+      if (userDoc.exists && userDoc.data() != null) {
         // Ritorna l'utente selezionato
-        return UserModel.fromMap(usersRef.data()!);
+        return UserModel.fromMap(userDoc.data()!);
       }
     } catch (e) {
-      print('Impossibile trovare un utente nel database: $e');
+      throw FirebaseUserException(
+          'Impossibile trovare un utente nel database: $e');
     }
 
     // Se l'operazione non va a buon fine ritorna null
@@ -40,36 +59,34 @@ class FirebaseUserHelper {
   }
 
   // Salva un nuovo utente nel database
+  @override
   Future<void> storeUserData(UserModel user) async {
-    // Assicura che firebase sia inizializzato
-    await FirebaseHelper.ensureInitialized();
-
     try {
       // Crea un nuovo utente nel database
-      await FirebaseFirestore.instance
+      await _firestore
           .collection(firebaseUsersCollectionLabel)
           .doc(user.id)
           .set(user.toMap());
     } catch (e) {
-      print('Errore durante il salvataggio dei dati utente nel database: $e');
+      throw FirebaseUserException(
+          'Errore durante il salvataggio dei dati utente nel database: $e');
     }
   }
 
   // Ottieni il numero di token correnti dell'utente corrente
-  Stream<int> getTokensCountStreamFromCurrentUser() async* {
-    await FirebaseHelper.ensureInitialized();
-
+  @override
+  Stream<int> getTokensCountStreamFromCurrentUser() {
     // Ottieni i dati dell'utente nel database
-    yield* FirebaseFirestore.instance
+    return _firestore
         .collection(firebaseUsersCollectionLabel)
-        .doc(getCurrentUserUid)
+        .doc(currentUserUid)
         .snapshots()
         .map((snapshot) {
       final data = snapshot.data();
       // Ottieni il riferimento all'oggetto che gestisce gli acquisti
       final purchaseInfo = data?[UserModel.purchaseInfoLabel];
-      // Ottieni il rifertimento al numero di token posseduti dall'utente
-      final tokensValue = purchaseInfo?[UserPurchaseInfoModel.lushTokensLabel];
+      // Ottieni il rifertimento al numero di token posseduti
+      final tokensValue = purchaseInfo?[UserPurchaseInfoField.lushTokens.name];
 
       // Restituisce tokensValue se è di tipo int, altrimenti -1
       return tokensValue is int ? tokensValue : -1;
@@ -77,21 +94,19 @@ class FirebaseUserHelper {
   }
 
   // Metodo per ottenere una lista di utenti registrati in base a una query di testo
-  Future<List<UserModel>> getUsersByQuery({
-    required String query,
+  Future<List<UserModel>> getUsersByQuery(
+    String query, {
     bool skipCurrentUser = true,
   }) async {
-    // Assicura che firebase sia inizializzato
-    await FirebaseHelper.ensureInitialized();
     try {
       // Ottieni la lista di utenti registrati che hanno un username simile alla query
-      final snapshot = await FirebaseFirestore.instance
+      final snapshot = await _firestore
           .collection(firebaseUsersCollectionLabel)
           .where(
-              '${UserModel.chatInfoLabel}.${UserChatInfoModel.usernameLabel}',
+              '${UserModel.chatInfoLabel}.${UserChatInfoField.username.name}',
               isGreaterThanOrEqualTo: query)
           .where(
-              '${UserModel.chatInfoLabel}.${UserChatInfoModel.usernameLabel}',
+              '${UserModel.chatInfoLabel}.${UserChatInfoField.username.name}',
               isLessThanOrEqualTo: '$query\uf8ff')
           .get();
 
@@ -100,16 +115,15 @@ class FirebaseUserHelper {
           snapshot.docs.map((doc) => UserModel.fromMap(doc.data())).toList();
 
       // Se skipCurrentUser è true, filtra l'utente corrente dalla lista
-      if (skipCurrentUser && getCurrentUserUid != null) {
-        users = users.where((user) => user.id != getCurrentUserUid).toList();
+      if (skipCurrentUser && currentUserUid != null) {
+        users = users.where((user) => user.id != currentUserUid).toList();
       }
 
       // Ritorna la lista filtrata di utenti
       return users;
     } catch (e) {
-      print('Errore durante la ricerca query degli utenti: $e');
+      throw FirebaseUserException(
+          'Errore durante la ricerca query degli utenti: $e');
     }
-    // Se l'operazione non va a buon fine ritorna una lista vuota
-    return const [];
   }
 }

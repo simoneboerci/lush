@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 
 import 'package:lush_app/widgets/custom_text_field.dart';
 
-class CustomDateTextField extends StatefulWidget {
+class CustomDateTextField extends StatelessWidget {
   const CustomDateTextField({
     super.key,
     required this.controller,
@@ -28,41 +28,35 @@ class CustomDateTextField extends StatefulWidget {
   final String? datePickerCancelText;
   final String? datePickerConfirmText;
 
-  @override
-  State<CustomDateTextField> createState() => _CustomDateTextFieldState();
-}
+  Future<void> _showDatePicker(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate ?? DateTime.now(),
+      firstDate: firstDate,
+      lastDate: lastDate,
+      barrierColor: datePickerBarrierColor,
+      helpText: datePickerHelpText,
+      cancelText: datePickerCancelText,
+      confirmText: datePickerConfirmText,
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light(),
+          child: child ?? Container(),
+        );
+      },
+    );
 
-class _CustomDateTextFieldState extends State<CustomDateTextField> {
+    if (pickedDate != null && controller.text.isEmpty) {
+      controller.text = DateFormat('dd/MM/yyyy').format(pickedDate);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    Future<void> showDatePickerOnPressed() async {
-      DateTime? pickedDate = await showDatePicker(
-        context: context,
-        firstDate: widget.firstDate,
-        lastDate: widget.lastDate,
-        barrierColor: widget.datePickerBarrierColor,
-        helpText: widget.datePickerHelpText,
-        cancelText: widget.datePickerCancelText,
-        confirmText: widget.datePickerConfirmText,
-        builder: (context, child) {
-          return Theme(
-            data: ThemeData.light(),
-            child: child ?? Container(),
-          );
-        },
-      );
-
-      setState(() {
-        if (widget.controller.text.isEmpty) {
-          widget.controller.text = DateFormat('dd/MM/yyyy').format(pickedDate!);
-        }
-      });
-    }
-
     return CustomTextField.large(
-      controller: widget.controller,
-      onTap: () => showDatePickerOnPressed(),
-      hintText: widget.hintText,
+      controller: controller,
+      onTap: () => _showDatePicker(context),
+      hintText: hintText,
     );
   }
 }

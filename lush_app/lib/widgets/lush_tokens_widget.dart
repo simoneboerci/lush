@@ -38,7 +38,8 @@ class LushTokensWidget extends StatelessWidget {
         mainAxisAlignment: mainAxisAlignment,
         children: [
           StreamBuilder<int>(
-              stream: FirebaseHelper.userHelper
+              stream: FirebaseHelper()
+                  .userHelper
                   .getTokensCountStreamFromCurrentUser(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {

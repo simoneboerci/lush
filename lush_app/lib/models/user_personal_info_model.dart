@@ -1,6 +1,19 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
-class UserPersonalInfoModel {
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:equatable/equatable.dart';
+
+enum UserPersonalInfoField {
+  name,
+  surname,
+  fiscalCode,
+  birthDate,
+  birthAddress,
+  residenceAddress,
+}
+
+@immutable
+class UserPersonalInfoModel extends Equatable {
   final String? name;
   final String? surname;
   final String? fiscalCode;
@@ -8,14 +21,7 @@ class UserPersonalInfoModel {
   final String? birthAddress;
   final String? residenceAddress;
 
-  static const nameLabel = 'name';
-  static const surnameLabel = 'surname';
-  static const fiscalCodeLabel = 'fiscal_code';
-  static const birthDateLabel = 'birth_date';
-  static const birthAddressLabel = 'birth_address_label';
-  static const residenceAddressLabel = 'residence_address_label';
-
-  UserPersonalInfoModel({
+  const UserPersonalInfoModel({
     this.name,
     this.surname,
     this.fiscalCode,
@@ -26,26 +32,27 @@ class UserPersonalInfoModel {
 
   factory UserPersonalInfoModel.fromMap(Map<String, dynamic> map) {
     return UserPersonalInfoModel(
-      name: map[nameLabel] as String?,
-      surname: map[surnameLabel] as String?,
-      fiscalCode: map[fiscalCodeLabel] as String?,
-      birthDate: map[birthDateLabel] != null
-          ? (map[birthDateLabel] as Timestamp).toDate()
+      name: map[UserPersonalInfoField.name.name] as String?,
+      surname: map[UserPersonalInfoField.surname.name] as String?,
+      fiscalCode: map[UserPersonalInfoField.fiscalCode.name] as String?,
+      birthDate: map[UserPersonalInfoField.birthDate.name] != null
+          ? (map[UserPersonalInfoField.birthDate.name] as Timestamp).toDate()
           : null,
-      birthAddress: map[birthAddressLabel] as String?,
-      residenceAddress: map[residenceAddressLabel] as String?,
+      birthAddress: map[UserPersonalInfoField.birthAddress.name] as String?,
+      residenceAddress:
+          map[UserPersonalInfoField.residenceAddress.name] as String?,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      UserPersonalInfoModel.nameLabel: name,
-      UserPersonalInfoModel.surnameLabel: surname,
-      UserPersonalInfoModel.fiscalCodeLabel: fiscalCode,
-      UserPersonalInfoModel.birthDateLabel:
+      UserPersonalInfoField.name.name: name,
+      UserPersonalInfoField.surname.name: surname,
+      UserPersonalInfoField.fiscalCode.name: fiscalCode,
+      UserPersonalInfoField.birthDate.name:
           birthDate != null ? Timestamp.fromDate(birthDate!) : null,
-      UserPersonalInfoModel.birthAddressLabel: birthAddress,
-      UserPersonalInfoModel.residenceAddressLabel: residenceAddress,
+      UserPersonalInfoField.birthAddress.name: birthAddress,
+      UserPersonalInfoField.residenceAddress.name: residenceAddress,
     };
   }
 
@@ -66,4 +73,8 @@ class UserPersonalInfoModel {
       residenceAddress: residenceAddress ?? this.residenceAddress,
     );
   }
+
+  @override
+  List<Object?> get props =>
+      [name, surname, fiscalCode, birthDate, birthAddress, residenceAddress];
 }

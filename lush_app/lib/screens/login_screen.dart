@@ -28,10 +28,11 @@ class LoginScreen extends StatelessWidget {
       String email = _emailController.text;
       String password = _passwordController.text;
 
-      UserModel? loggedUser = await FirebaseHelper.loginHelper
+      UserModel? loggedUser = await FirebaseHelper()
+          .loginHelper
           .loginWithEmailAndPassword(email, password);
       if (loggedUser != null) {
-        return FirebaseHelper.userHelper.getUserWithUid(loggedUser.id);
+        return FirebaseHelper().userHelper.getUserWithUid(loggedUser.id);
       }
     }
 
@@ -39,10 +40,11 @@ class LoginScreen extends StatelessWidget {
   }
 
   Future<UserModel?> _loginWithGoogle() async {
-    UserModel? loggedUser = await FirebaseHelper.loginHelper.loginWithGoogle();
+    UserModel? loggedUser =
+        await FirebaseHelper().loginHelper.loginWithGoogle();
 
     if (loggedUser != null) {
-      return await FirebaseHelper.userHelper.getUserWithUid(loggedUser.id);
+      return await FirebaseHelper().userHelper.getUserWithUid(loggedUser.id);
     }
 
     return null;
