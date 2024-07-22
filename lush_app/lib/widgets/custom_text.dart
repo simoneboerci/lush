@@ -20,6 +20,7 @@ class CustomText extends StatelessWidget {
     this.color = Colors.white,
     this.textOverflow,
     this.maxLines,
+    this.softWrap,
   });
 
   final EdgeInsets margin;
@@ -31,6 +32,7 @@ class CustomText extends StatelessWidget {
   final Color? color;
   final TextOverflow? textOverflow;
   final int? maxLines;
+  final bool? softWrap;
 
   String _getFontFamily() => switch (fontType) {
         FontType.title => cTitleFont,
@@ -46,6 +48,7 @@ class CustomText extends StatelessWidget {
         text,
         textAlign: textAlign,
         maxLines: maxLines,
+        softWrap: softWrap,
         style: TextStyle(
           fontFamily: _getFontFamily(),
           fontSize: fontSize,

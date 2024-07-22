@@ -2,14 +2,11 @@ import 'package:flutter/material.dart';
 
 import 'package:lush_app/constants/images.dart';
 
-import 'package:lush_app/services/firebase_helper.dart';
-
 import 'package:lush_app/models/chat_model.dart';
 import 'package:lush_app/models/message_model.dart';
 
 import 'package:lush_app/widgets/custom_text.dart';
 import 'package:lush_app/widgets/message_status_widget.dart';
-import 'package:lush_app/widgets/unread_message_bubble_widget.dart';
 
 class ContactListTileWidget extends StatelessWidget {
   const ContactListTileWidget({
@@ -45,7 +42,7 @@ class ContactListTileWidget extends StatelessWidget {
   final double? subtitleFontSize;
   final Color? trailingTextColor;
   final double? trailingFontSize;
-  final Function()? onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {

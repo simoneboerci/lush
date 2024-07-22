@@ -4,7 +4,7 @@ import 'package:lush_app/constants/colors.dart';
 
 import 'package:lush_app/widgets/custom_text_field.dart';
 
-class SendMessageWidget extends StatefulWidget {
+class SendMessageWidget extends StatelessWidget {
   const SendMessageWidget({
     super.key,
     required this.controller,
@@ -19,14 +19,9 @@ class SendMessageWidget extends StatefulWidget {
   final Function(String)? onMessageSent;
 
   @override
-  State<SendMessageWidget> createState() => _SendMessageWidgetState();
-}
-
-class _SendMessageWidgetState extends State<SendMessageWidget> {
-  @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: widget.padding,
+      padding: padding,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -34,18 +29,20 @@ class _SendMessageWidgetState extends State<SendMessageWidget> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: CustomTextField.smallRounded(
-                controller: widget.controller,
+                controller: controller,
                 hintText: 'Scrivi un messaggio...',
-                onChanged: (value) {
-                  setState(() {});
-                  widget.onChanged;
-                },
+                onChanged: onChanged,
               ),
             ),
           ),
-          widget.controller.text == ''
-              ? _buildPhotoAndAudioIcon()
-              : _buildSendMessageButton(),
+          ValueListenableBuilder<TextEditingValue>(
+            valueListenable: controller,
+            builder: (context, value, child) {
+              return value.text.isEmpty
+                  ? _buildPhotoAndAudioIcon()
+                  : _buildSendMessageButton();
+            },
+          ),
         ],
       ),
     );
@@ -57,18 +54,14 @@ class _SendMessageWidgetState extends State<SendMessageWidget> {
         IconButton(
           onPressed: () {},
           color: cSecondaryColor,
-          icon: const Icon(
-            Icons.camera_alt_outlined,
-            size: 30.0,
-          ),
+          icon: const Icon(Icons.camera_alt_outlined),
+          iconSize: 30.0,
         ),
         IconButton(
           onPressed: () {},
           color: cSecondaryColor,
-          icon: const Icon(
-            Icons.mic_none_outlined,
-            size: 40.0,
-          ),
+          icon: const Icon(Icons.mic_none_outlined),
+          iconSize: 40.0,
         ),
       ],
     );
@@ -78,14 +71,13 @@ class _SendMessageWidgetState extends State<SendMessageWidget> {
     return Padding(
       padding: const EdgeInsets.only(right: 16.0),
       child: IconButton.filled(
-        style: IconButton.styleFrom(
-          backgroundColor: cPrimaryColor,
-        ),
+        style: IconButton.styleFrom(backgroundColor: cPrimaryColor),
         onPressed: () {
-          if (widget.onMessageSent != null) {
-            widget.onMessageSent!(widget.controller.text);
+          final message = controller.text;
+          if (message.isNotEmpty) {
+            onMessageSent?.call(message);
+            controller.clear();
           }
-          widget.controller.text = '';
         },
         icon: const Icon(Icons.send),
       ),

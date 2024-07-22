@@ -31,30 +31,25 @@ class MessageStatusWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (message.senderId != FirebaseHelper().userHelper.currentUserUid) {
-      return Container();
-    } else {
-      switch (message.status) {
-        case MessageStatus.sent:
-          return Icon(
-            sentIcon,
-            color: sentIconColor,
-            size: iconSize,
-          ); // Spunta singola se non è stato consegnato
-        case MessageStatus.delivered:
-          return Icon(
-            deliveredIcon,
-            color: deliveredIconColor,
-            size: iconSize,
-          ); // Spunta doppia se consegnato ma non letto
-        case MessageStatus.read:
-          return Icon(
-            readIcon,
-            color: readIconColor,
-            size: iconSize,
-          ); // Spunta doppia colorata se letto
-        default:
-          return Container(); // Default case
-      }
+      return const SizedBox.shrink();
     }
+
+    return switch (message.status) {
+      MessageStatus.sent => Icon(
+          sentIcon,
+          color: sentIconColor,
+          size: iconSize,
+        ),
+      MessageStatus.delivered => Icon(
+          deliveredIcon,
+          color: deliveredIconColor,
+          size: iconSize,
+        ),
+      MessageStatus.read => Icon(
+          readIcon,
+          color: readIconColor,
+          size: iconSize,
+        ),
+    };
   }
 }

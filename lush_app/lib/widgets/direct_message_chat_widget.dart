@@ -17,12 +17,12 @@ class DirectMessageChatWidget extends StatelessWidget {
   const DirectMessageChatWidget({
     super.key,
     required this.scrollController,
-    this.scrollAnimationDuration = 300,
+    this.scrollAnimationDuration = const Duration(milliseconds: 300),
     this.onReply,
   });
 
   final ScrollController scrollController;
-  final int scrollAnimationDuration;
+  final Duration scrollAnimationDuration;
   final Function(MessageModel message)? onReply;
 
   @override
@@ -48,80 +48,81 @@ class DirectMessageChatWidget extends StatelessWidget {
 
           final messages = snapshot.data!.reversed.toList();
 
-          return ValueListenableBuilder(
-            valueListenable: ValueNotifier(messages.length),
-            builder: (context, value, child) {
-              return ListView.builder(
-                controller: scrollController,
-                itemCount: messages.length,
-                reverse: true, // Inverti l'ordine della lista
-                itemBuilder: (context, index) {
-                  final message = messages[index];
-                  String? previousMessageSender = index < messages.length - 1
-                      ? messages[index + 1].senderId
-                      : null;
-
-                  EdgeInsets padding = message.senderId != previousMessageSender
-                      ? const EdgeInsets.only(bottom: 8.0)
-                      : EdgeInsets.zero;
-
-                  return Padding(
-                    padding: padding,
-                    child: MessageBubbleWidget(
-                      message: message,
-                      isMe: message.senderId ==
-                          FirebaseHelper().userHelper.currentUserUid,
-                      onReplyTap: (replyMessageId) =>
-                          _scrollToMessage(replyMessageId, messages),
-                      onLongPressActions: [
-                        ActionItemDirectOverlayWidget(
-                          label: 'Aggiungi ai preferiti',
-                          icon: Icons.bookmark_border,
-                          onTap: () {},
-                        ),
-                        ActionItemDirectOverlayWidget(
-                          label: 'Rispondi',
-                          icon: Icons.replay,
-                          onTap: () {
-                            print('Reply action tapped');
-                            if (onReply != null) {
-                              onReply!(message);
-                            }
-                          },
-                        ),
-                        ActionItemDirectOverlayWidget(
-                          label: 'Copia',
-                          icon: Icons.content_copy,
-                          onTap: () {},
-                        ),
-                        ActionItemDirectOverlayWidget(
-                          label: 'Fissa',
-                          icon: Icons.push_pin_outlined,
-                          onTap: () {},
-                        ),
-                        ActionItemDirectOverlayWidget(
-                          label: 'Segnala',
-                          icon: Icons.flag_outlined,
-                          onTap: () {},
-                        ),
-                        ActionItemDirectOverlayWidget(
-                          label: 'Elimina',
-                          icon: Icons.delete_outlined,
-                          iconColor: cPrimaryColor,
-                          textColor: cPrimaryColor,
-                          onTap: () {},
-                          addDivider: false,
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              );
-            },
+          return ListView.builder(
+            controller: scrollController,
+            itemCount: messages.length,
+            reverse: true,
+            itemBuilder: (context, index) =>
+                _buildMessageItem(context, messages, index),
           );
         },
       ),
     );
+  }
+
+  Widget _buildMessageItem(
+      BuildContext context, List<MessageModel> messages, int index) {
+    final message = messages[index];
+    final String? previousMessageSender =
+        index < messages.length - 1 ? messages[index + 1].senderId : null;
+
+    final EdgeInsets padding = message.senderId != previousMessageSender
+        ? const EdgeInsets.only(bottom: 8.0)
+        : EdgeInsets.zero;
+
+    return Padding(
+      padding: padding,
+      child: MessageBubbleWidget(
+        message: message,
+        isMe: message.senderId == FirebaseHelper().userHelper.currentUserUid,
+        onReplyTap: (replyMessageId) =>
+            _scrollToMessage(replyMessageId, messages),
+        onLongPressActions: _buildLongPressActions(context, message),
+      ),
+    );
+  }
+
+  List<ActionItemDirectOverlayWidget> _buildLongPressActions(
+      BuildContext context, MessageModel message) {
+    return [
+      ActionItemDirectOverlayWidget(
+        label: 'Aggiungi ai preferiti',
+        icon: Icons.bookmark_border,
+        onTap: () {},
+      ),
+      ActionItemDirectOverlayWidget(
+        label: 'Rispondi',
+        icon: Icons.replay,
+        onTap: () {
+          if (onReply != null) {
+            onReply!(message);
+          }
+        },
+      ),
+      ActionItemDirectOverlayWidget(
+        label: 'Copia',
+        icon: Icons.content_copy,
+        onTap: () {},
+      ),
+      ActionItemDirectOverlayWidget(
+        label: 'Fissa',
+        icon: Icons.push_pin_outlined,
+        onTap: () {},
+      ),
+      ActionItemDirectOverlayWidget(
+        label: 'Segnala',
+        icon: Icons.flag_outlined,
+        onTap: () {},
+      ),
+      ActionItemDirectOverlayWidget(
+        label: 'Elimina',
+        icon: Icons.delete_outlined,
+        iconColor: cPrimaryColor,
+        textColor: cPrimaryColor,
+        onTap: () {},
+        addDivider: false,
+      ),
+    ];
   }
 
   void _scrollToMessage(String messageId, List<MessageModel> messages) {
@@ -129,7 +130,7 @@ class DirectMessageChatWidget extends StatelessWidget {
     if (index != -1) {
       scrollController.animateTo(
         index * 100.0, // Assumendo un'altezza fissa per ogni messaggio
-        duration: Duration(milliseconds: scrollAnimationDuration),
+        duration: scrollAnimationDuration,
         curve: Curves.easeInOut,
       );
     }
