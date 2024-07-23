@@ -13,3 +13,7 @@ const AssetImage cLightLightBlueLogo =
 const AssetImage kDarkPinkLogo = AssetImage('assets/images/dark_pink_logo.png');
 const AssetImage kDarkLightBlueLogo =
     AssetImage('assets/images/dark_light_blue_logo.png');
+
+const AssetImage cPinkTongue = AssetImage('assets/images/pink_tongue.png');
+
+const AssetImage cLushTokenIcon = AssetImage('assets/images/lush_token.png');

@@ -69,8 +69,10 @@ class FirstStepVerificationScreen extends StatelessWidget {
     if (currentUser != null) {
       _nameController.text = currentUser.name ?? '';
       _surnameController.text = currentUser.surname ?? '';
-      _birthDateController.text =
-          DateFormat('dd/MM/yyyy').format(currentUser.birthDate!);
+      if (currentUser.birthDate != null) {
+        _birthDateController.text =
+            DateFormat('dd/MM/yyyy').format(currentUser.birthDate!);
+      }
       _birthAddressController.text = currentUser.birthAddress ?? '';
     }
   }
