@@ -15,6 +15,18 @@ extension MessageStatusExtension on MessageStatus {
   }
 }
 
+enum MediaType { image, video }
+
+extension MediaTypeExtension on MediaType {
+  String toStringValue() => toString().split('.').last;
+
+  static MediaType fromString(String type) {
+    return MediaType.values.firstWhere(
+        (e) => e.toString().split('.').last == type,
+        orElse: () => throw ArgumentError('Invalid media type: $type'));
+  }
+}
+
 enum MessageModelField {
   id,
   chatId,
@@ -24,6 +36,8 @@ enum MessageModelField {
   status,
   replyToMessageId,
   favorites,
+  mediaUrl,
+  mediaType,
 }
 
 abstract class IMessageModel extends Equatable {
@@ -37,6 +51,8 @@ abstract class IMessageModel extends Equatable {
     MessageStatus? status,
     String? replyToMessageId,
     Map<String, bool>? favorites,
+    String? mediaUrl,
+    MediaType? mediaType,
   });
 
   bool isFavoriteForUser(String userId);
@@ -52,6 +68,8 @@ class MessageModel extends IMessageModel {
   final MessageStatus status;
   final String? replyToMessageId;
   final Map<String, bool> favorites;
+  final String? mediaUrl;
+  final MediaType? mediaType;
 
   MessageModel({
     required this.id,
@@ -62,6 +80,8 @@ class MessageModel extends IMessageModel {
     this.status = MessageStatus.sent,
     this.replyToMessageId,
     this.favorites = const {},
+    this.mediaUrl,
+    this.mediaType,
   });
 
   factory MessageModel.fromMap(Map<String, dynamic> map) {
@@ -79,6 +99,10 @@ class MessageModel extends IMessageModel {
       replyToMessageId: map[MessageModelField.replyToMessageId.name] as String?,
       favorites:
           Map<String, bool>.from(map[MessageModelField.favorites.name] ?? {}),
+      mediaUrl: map[MessageModelField.mediaUrl.name] as String?,
+      mediaType: map[MessageModelField.mediaType.name] != null
+          ? MediaTypeExtension.fromString(map[MessageModelField.mediaType.name])
+          : null,
     );
   }
 
@@ -93,6 +117,8 @@ class MessageModel extends IMessageModel {
       MessageModelField.status.name: status.toStringValue(),
       MessageModelField.replyToMessageId.name: replyToMessageId,
       MessageModelField.favorites.name: favorites,
+      MessageModelField.mediaUrl.name: mediaUrl,
+      MessageModelField.mediaType.name: mediaType,
     };
   }
 
@@ -106,6 +132,8 @@ class MessageModel extends IMessageModel {
     MessageStatus? status,
     String? replyToMessageId,
     Map<String, bool>? favorites,
+    String? mediaUrl,
+    MediaType? mediaType,
   }) {
     return MessageModel(
       id: id ?? this.id,
@@ -116,6 +144,8 @@ class MessageModel extends IMessageModel {
       status: status ?? this.status,
       replyToMessageId: replyToMessageId ?? this.replyToMessageId,
       favorites: favorites ?? this.favorites,
+      mediaUrl: mediaUrl ?? this.mediaUrl,
+      mediaType: mediaType ?? this.mediaType,
     );
   }
 
@@ -132,5 +162,7 @@ class MessageModel extends IMessageModel {
         status,
         replyToMessageId,
         favorites,
+        mediaUrl,
+        mediaType,
       ];
 }

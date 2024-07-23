@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:lush_app/models/firebase_chat_exception.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:lush_app/services/firebase_helper.dart';
 
+import 'package:lush_app/models/firebase_chat_exception.dart';
 import 'package:lush_app/models/chat_model.dart';
 import 'package:lush_app/models/message_model.dart';
 
@@ -16,6 +19,8 @@ abstract class IFirebaseChatsHelper {
 
   Future<void> toggleFavoriteMessage(
       String chatId, String messageId, String userId);
+
+  Future<String> uploadFile(File file);
 }
 
 // Classe che gestisce le operazioni di chats e messaggi tramite utenti e firebase
@@ -237,5 +242,17 @@ class FirebaseChatsHelper implements IFirebaseChatsHelper {
     } catch (e) {
       throw FirebaseChatException('Failed to toggle favorite message: $e');
     }
+  }
+
+  @override
+  Future<String> uploadFile(File file) async {
+    final storageRef = FirebaseStorage.instance.ref();
+    final fileRef =
+        storageRef.child('images/${DateTime.now().toIso8601String()}');
+
+    await fileRef.putFile(file);
+
+    final fileUrl = await fileRef.getDownloadURL();
+    return fileUrl;
   }
 }

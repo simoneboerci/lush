@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
 import 'package:lush_app/constants/colors.dart';
 
@@ -90,6 +91,7 @@ class _MessageContent extends StatelessWidget {
             style: style,
             onReplyTap: onReplyTap,
           ),
+        if (message.mediaUrl != null) _buildMediaPlayer(),
         SizedBox(
           height: message.replyToMessageId != null ? 8.0 : 0,
         ),
@@ -97,6 +99,93 @@ class _MessageContent extends StatelessWidget {
         SizedBox(height: style.timestampSpacing),
         _MessageTimestamp(message: message, isMe: isMe, style: style),
       ],
+    );
+  }
+
+  Widget _buildMediaPlayer() {
+    if (message.mediaType == MediaType.image) {
+      return Image.network(message.mediaUrl!);
+    } else if (message.mediaType == MediaType.video) {
+      return VideoPlayerWidget(videoUrl: message.mediaUrl!);
+    }
+
+    return const Text('Errore durante il carimento del media');
+  }
+}
+
+class VideoPlayerWidget extends StatefulWidget {
+  final String videoUrl;
+
+  const VideoPlayerWidget({super.key, required this.videoUrl});
+
+  @override
+  State<StatefulWidget> createState() => VideoPlayerWidgetState();
+}
+
+class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
+  late VideoPlayerController _controller;
+
+  @override
+  void initState() {
+    _controller =
+        VideoPlayerController.networkUrl(Uri.dataFromString(widget.videoUrl))
+          ..initialize().then((_) {
+            setState(() {});
+          });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _controller.value.isInitialized
+        ? AspectRatio(
+            aspectRatio: _controller.value.aspectRatio,
+            child: Stack(
+              alignment: Alignment.bottomCenter,
+              children: [
+                VideoPlayer(_controller),
+                _ControlsOverlay(controller: _controller),
+                VideoProgressIndicator(
+                  _controller,
+                  allowScrubbing: true,
+                ),
+              ],
+            ),
+          )
+        : const Center(child: CircularProgressIndicator());
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+}
+
+class _ControlsOverlay extends StatelessWidget {
+  final VideoPlayerController controller;
+
+  const _ControlsOverlay({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      child: controller.value.isPlaying
+          ? Container()
+          : Container(
+              color: Colors.black45,
+              child: Center(
+                child: IconButton(
+                  icon: const Icon(Icons.play_arrow),
+                  color: Colors.white,
+                  iconSize: 50.0,
+                  onPressed: () {
+                    controller.play();
+                  },
+                ),
+              ),
+            ),
     );
   }
 }
