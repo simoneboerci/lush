@@ -1,13 +1,13 @@
 import 'package:flutter/foundation.dart';
 
-import '../models/lush_user.dart';
+import '../models/user_model.dart';
 
 class UserProvider with ChangeNotifier {
-  LushUser? _user;
+  UserModel? _user;
 
-  LushUser? get user => _user;
+  UserModel? get user => _user;
 
-  void setUser(LushUser user) {
+  void setUser(UserModel user) {
     _user = user;
     notifyListeners();
   }

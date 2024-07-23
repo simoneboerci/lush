@@ -6,21 +6,23 @@ class CustomBackground extends StatelessWidget {
     super.key,
     this.padding = const EdgeInsets.all(28.0),
     this.child,
+    this.appBar,
   });
 
   final EdgeInsets padding;
   final Widget? child;
+  final AppBar? appBar;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: appBar,
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: kBackgroundGradient,
-        ),
-        padding: padding,
-        child: child ?? Container(),
-      ),
+          decoration: const BoxDecoration(
+            gradient: kBackgroundGradient,
+          ),
+          padding: padding,
+          child: child ?? Container()),
     );
   }
 }

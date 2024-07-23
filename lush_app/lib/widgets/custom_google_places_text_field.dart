@@ -21,7 +21,7 @@ class CustomGooglePlacesTextField extends StatelessWidget {
 
   final TextEditingController controller;
   final String? hintText;
-  final Function? onTap;
+  final VoidCallback? onTap;
   final double borderRadius;
   final List<String>? countries;
   final int debounceTime;
@@ -29,7 +29,7 @@ class CustomGooglePlacesTextField extends StatelessWidget {
   final Function(Prediction)? itemClick;
   final bool showError;
 
-  final String _googleAPIKey = 'AIzaSyCsRrormWUEL60j4bw2oMUO0gON7Z0yBg0';
+  static const String _googleAPIKey = 'AIzaSyCsRrormWUEL60j4bw2oMUO0gON7Z0yBg0';
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +38,7 @@ class CustomGooglePlacesTextField extends StatelessWidget {
       hintText: hintText,
       onTap: () {
         _showPlacesAutocomplete(context);
-        onTap;
+        onTap?.call();
       },
     );
   }
@@ -69,7 +69,7 @@ class CustomGooglePlacesTextField extends StatelessWidget {
                   TextPosition(offset: prediction.description!.length),
                 );
                 Navigator.of(context).pop();
-                itemClick!(prediction);
+                itemClick?.call(prediction);
               },
             ),
           ],

@@ -2,14 +2,19 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 
+import 'package:lush_app/constants/routes.dart';
+
 import 'package:lush_app/services/firebase_helper.dart';
+import 'package:lush_app/services/chat_provider.dart';
 import 'package:lush_app/services/user_provider.dart';
 
-import 'routes.dart';
-
 void main() {
-  runApp(ChangeNotifierProvider(
-    create: (_) => UserProvider(),
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider<UserProvider>(create: (_) => UserProvider()),
+      ChangeNotifierProvider<ChatProvider>(
+          create: (_) => ChatProvider(firebaseHelper: FirebaseHelper())),
+    ],
     child: const MyApp(),
   ));
 }
@@ -24,7 +29,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   void initState() {
-    FirebaseHelper.ensureInitialized();
+    FirebaseHelper().ensureInitialized();
     super.initState();
   }
 

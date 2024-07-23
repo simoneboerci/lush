@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-
-import 'package:intl/intl.dart';
-import 'package:lush_app/widgets/custom_date_text_field.dart';
-import 'package:lush_app/widgets/custom_google_places_text_field.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 import 'package:lush_app/constants/images.dart';
 
-import 'package:lush_app/models/lush_user.dart';
+import 'package:lush_app/models/user_model.dart';
 
 import 'package:lush_app/services/firebase_helper.dart';
 import 'package:lush_app/services/user_provider.dart';
@@ -17,6 +14,8 @@ import 'package:lush_app/widgets/custom_elevated_button.dart';
 import 'package:lush_app/widgets/custom_form.dart';
 import 'package:lush_app/widgets/custom_text_field.dart';
 import 'package:lush_app/widgets/registration_header.dart';
+import 'package:lush_app/widgets/custom_date_text_field.dart';
+import 'package:lush_app/widgets/custom_google_places_text_field.dart';
 
 class FirstStepVerificationScreen extends StatelessWidget {
   FirstStepVerificationScreen({super.key});
@@ -28,18 +27,20 @@ class FirstStepVerificationScreen extends StatelessWidget {
   final TextEditingController _birthDateController = TextEditingController();
   final TextEditingController _birthAddressController = TextEditingController();
 
-  Future<LushUser?> _confirmFirstStepVerification(LushUser loggedUser) async {
+  Future<UserModel?> _confirmFirstStepVerification(UserModel loggedUser) async {
     if (_formKey.currentState!.validate()) {
       try {
-        LushUser updatedUser = LushUser.copyWith(
-          user: loggedUser,
-          name: _nameController.text,
-          surname: _surnameController.text,
-          birthDate: DateFormat('dd/MM/yyyy').parse(_birthDateController.text),
-          birthAddress: _birthAddressController.text,
+        UserModel updatedUser = loggedUser.copyWith(
+          personalInfo: loggedUser.personalInfo.copyWith(
+            name: _nameController.text,
+            surname: _surnameController.text,
+            birthDate:
+                DateFormat('dd/MM/yyyy').parse(_birthDateController.text),
+            birthAddress: _birthAddressController.text,
+          ),
         );
 
-        await FirebaseHelper.storeUserData(updatedUser);
+        await FirebaseHelper().userHelper.storeUserData(updatedUser);
 
         return updatedUser;
       } catch (e) {
@@ -63,17 +64,18 @@ class FirstStepVerificationScreen extends StatelessWidget {
   }
 
   void _updateTextFieldTextsBasedOnUser(BuildContext context) {
-    LushUser? currentUser =
+    UserModel? currentUser =
         Provider.of<UserProvider>(context, listen: false).user;
 
     if (currentUser != null) {
-      _nameController.text = currentUser.name ?? '';
-      _surnameController.text = currentUser.surname ?? '';
-      if (currentUser.birthDate != null) {
-        _birthDateController.text =
-            DateFormat('dd/MM/yyyy').format(currentUser.birthDate!);
+      _nameController.text = currentUser.personalInfo.name ?? '';
+      _surnameController.text = currentUser.personalInfo.surname ?? '';
+      if (currentUser.personalInfo.birthDate != null) {
+        _birthDateController.text = DateFormat('dd/MM/yyyy')
+            .format(currentUser.personalInfo.birthDate!);
       }
-      _birthAddressController.text = currentUser.birthAddress ?? '';
+      _birthAddressController.text =
+          currentUser.personalInfo.birthAddress ?? '';
     }
   }
 

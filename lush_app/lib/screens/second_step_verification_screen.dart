@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:lush_app/constants/images.dart';
-import 'package:lush_app/models/lush_user.dart';
+
+import 'package:lush_app/models/user_model.dart';
+
 import 'package:lush_app/services/firebase_helper.dart';
 import 'package:lush_app/services/user_provider.dart';
 
@@ -11,7 +14,6 @@ import 'package:lush_app/widgets/custom_form.dart';
 import 'package:lush_app/widgets/custom_google_places_text_field.dart';
 import 'package:lush_app/widgets/custom_text_field.dart';
 import 'package:lush_app/widgets/registration_header.dart';
-import 'package:provider/provider.dart';
 
 class SecondStepVerificationScreen extends StatelessWidget {
   SecondStepVerificationScreen({super.key});
@@ -23,17 +25,21 @@ class SecondStepVerificationScreen extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneNumberController = TextEditingController();
 
-  Future<LushUser?> _confirmSecondStepVerification(LushUser loggedUser) async {
+  Future<UserModel?> _confirmSecondStepVerification(
+      UserModel loggedUser) async {
     if (_formKey.currentState!.validate()) {
       try {
-        LushUser updatedUser = LushUser.copyWith(
-          user: loggedUser,
-          residenceAddress: _residenceAddressController.text,
-          email: _emailController.text,
-          phoneNumber: _phoneNumberController.text,
+        UserModel updatedUser = loggedUser.copyWith(
+          personalInfo: loggedUser.personalInfo.copyWith(
+            residenceAddress: _residenceAddressController.text,
+          ),
+          contactInfo: loggedUser.contactInfo.copyWith(
+            email: _emailController.text,
+            phoneNumber: _phoneNumberController.text,
+          ),
         );
 
-        await FirebaseHelper.storeUserData(updatedUser);
+        await FirebaseHelper().userHelper.storeUserData(updatedUser);
 
         return updatedUser;
       } catch (e) {
@@ -57,13 +63,14 @@ class SecondStepVerificationScreen extends StatelessWidget {
   }
 
   void _updateTextFieldTextsBasedOnUser(BuildContext context) {
-    LushUser? currentUser =
+    UserModel? currentUser =
         Provider.of<UserProvider>(context, listen: false).user;
 
     if (currentUser != null) {
-      _residenceAddressController.text = currentUser.residenceAddress ?? '';
-      _emailController.text = currentUser.email ?? '';
-      _phoneNumberController.text = currentUser.phoneNumber ?? '';
+      _residenceAddressController.text =
+          currentUser.personalInfo.residenceAddress ?? '';
+      _emailController.text = currentUser.contactInfo.email ?? '';
+      _phoneNumberController.text = currentUser.contactInfo.phoneNumber ?? '';
     }
   }
 

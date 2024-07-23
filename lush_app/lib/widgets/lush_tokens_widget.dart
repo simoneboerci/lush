@@ -8,11 +8,20 @@ import 'package:lush_app/constants/images.dart';
 class LushTokensWidget extends StatelessWidget {
   const LushTokensWidget({
     super.key,
+    this.padding = EdgeInsets.zero,
+    this.imageWidth = 26.0,
+    this.textColor = Colors.white,
+    this.fontSize = 16.0,
+    this.mainAxisAlignment = MainAxisAlignment.end,
+  });
+
+  const LushTokensWidget.large({
+    super.key,
     this.padding = const EdgeInsets.all(8.0),
     this.imageWidth = 40.0,
     this.textColor = Colors.white,
     this.fontSize = 30.0,
-    this.mainAxisAlignment = MainAxisAlignment.end,
+    this.mainAxisAlignment = MainAxisAlignment.center,
   });
 
   final EdgeInsets padding;
@@ -29,7 +38,9 @@ class LushTokensWidget extends StatelessWidget {
         mainAxisAlignment: mainAxisAlignment,
         children: [
           StreamBuilder<int>(
-              stream: FirebaseHelper.getTokensCountStreamFromCurrentUser(),
+              stream: FirebaseHelper()
+                  .userHelper
+                  .getTokensCountStreamFromCurrentUser(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const SizedBox(
@@ -40,7 +51,10 @@ class LushTokensWidget extends StatelessWidget {
                 } else if (snapshot.hasError) {
                   return Text(
                     'Errore: ${snapshot.error}',
-                    style: TextStyle(color: Colors.red, fontSize: fontSize),
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: fontSize,
+                    ),
                   );
                 } else if (snapshot.hasData) {
                   return Text(

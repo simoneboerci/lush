@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:lush_app/constants/colors.dart';
 import 'package:lush_app/constants/images.dart';
 import 'package:lush_app/widgets/custom_background.dart';
@@ -74,13 +75,15 @@ class VerificationCompletedScreen extends StatelessWidget {
               ),
             ],
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16.0),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: CustomElevatedButton(
               backgroundColor: Colors.transparent,
               text: 'Torna alla schermata principale ->',
               textColor: Colors.white,
               fontFamily: 'Montserrat',
+              onPressed: () =>
+                  Navigator.pushReplacementNamed(context, '/login_screen'),
             ),
           ),
         ],

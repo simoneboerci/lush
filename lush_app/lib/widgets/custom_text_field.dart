@@ -14,7 +14,7 @@ class CustomTextField extends StatelessWidget {
     this.cursorErrorColor,
     this.cursorHeight,
     this.filled = false,
-    this.borderRadius = 0.0,
+    this.borderRadius = const BorderRadius.all(Radius.circular(0.0)),
     this.borderSide = BorderSide.none,
     this.obscureText = false,
     this.textStyleHeight,
@@ -28,6 +28,8 @@ class CustomTextField extends StatelessWidget {
     this.hintText,
     this.prefixIcon,
     this.prefixIconColor,
+    this.maxLines,
+    this.maxHeight = double.infinity,
   });
 
   const CustomTextField.large({
@@ -42,7 +44,7 @@ class CustomTextField extends StatelessWidget {
     this.cursorErrorColor = cSecondaryColor,
     this.cursorHeight = 16.0,
     this.filled = true,
-    this.borderRadius = 16.0,
+    this.borderRadius = const BorderRadius.all(Radius.circular(16.0)),
     this.borderSide = BorderSide.none,
     this.obscureText = false,
     this.textStyleHeight = 2.0,
@@ -56,20 +58,23 @@ class CustomTextField extends StatelessWidget {
     this.hintText,
     this.prefixIcon,
     this.prefixIconColor,
+    this.maxLines = 1,
+    this.maxHeight = double.infinity,
   });
 
   const CustomTextField.small({
     super.key,
     this.padding = const EdgeInsets.symmetric(vertical: 12.0),
     this.validator,
-    this.contentPadding = const EdgeInsets.symmetric(horizontal: 28.0),
+    this.contentPadding =
+        const EdgeInsets.symmetric(horizontal: 28.0, vertical: 8.0),
     this.controller,
     this.fillColor = const Color(0xFF333333),
     this.cursorColor = cSecondaryColor,
     this.cursorErrorColor = cSecondaryColor,
     this.cursorHeight,
     this.filled = true,
-    this.borderRadius = 16.0,
+    this.borderRadius = const BorderRadius.all(Radius.circular(16.0)),
     this.borderSide = BorderSide.none,
     this.obscureText = false,
     this.textStyleHeight,
@@ -83,20 +88,23 @@ class CustomTextField extends StatelessWidget {
     this.hintText,
     this.prefixIcon,
     this.prefixIconColor = Colors.white30,
+    this.maxLines = 1,
+    this.maxHeight = double.infinity,
   });
 
   const CustomTextField.smallRounded({
     super.key,
     this.padding = const EdgeInsets.symmetric(vertical: 12.0),
     this.validator,
-    this.contentPadding = const EdgeInsets.symmetric(horizontal: 28.0),
+    this.contentPadding =
+        const EdgeInsets.symmetric(horizontal: 28.0, vertical: 8.0),
     this.controller,
     this.fillColor = const Color(0xFF333333),
     this.cursorColor = cSecondaryColor,
     this.cursorErrorColor = cSecondaryColor,
     this.cursorHeight,
     this.filled = true,
-    this.borderRadius = 100.0,
+    this.borderRadius = const BorderRadius.all(Radius.circular(25.0)),
     this.borderSide = BorderSide.none,
     this.obscureText = false,
     this.textStyleHeight,
@@ -110,6 +118,8 @@ class CustomTextField extends StatelessWidget {
     this.hintText,
     this.prefixIcon,
     this.prefixIconColor,
+    this.maxLines,
+    this.maxHeight = 150.0,
   });
 
   final EdgeInsets padding;
@@ -121,7 +131,7 @@ class CustomTextField extends StatelessWidget {
   final Color? cursorErrorColor;
   final double? cursorHeight;
   final bool filled;
-  final double borderRadius;
+  final BorderRadius borderRadius;
   final BorderSide borderSide;
   final bool obscureText;
   final double? textStyleHeight;
@@ -135,38 +145,42 @@ class CustomTextField extends StatelessWidget {
   final Function()? onTap;
   final Icon? prefixIcon;
   final Color? prefixIconColor;
+  final int? maxLines;
+  final double maxHeight;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: padding,
-      child: TextFormField(
-        validator: validator,
-        obscureText: obscureText,
-        onChanged: onChanged,
-        onEditingComplete: onEditingComplete,
-        onFieldSubmitted: onFieldSubmitted,
-        onSaved: onSaved,
-        onTap: onTap,
-        cursorColor: cursorColor,
-        cursorErrorColor: cursorErrorColor,
-        cursorHeight: cursorHeight,
-        controller: controller,
-        style: TextStyle(height: textStyleHeight, color: textColor),
-        decoration: InputDecoration(
-          prefixIcon: prefixIcon,
-          prefixIconColor: prefixIconColor,
-          hintStyle: TextStyle(
-            color: hintTextColor,
+      child: Container(
+        constraints: BoxConstraints(maxHeight: maxHeight),
+        child: TextFormField(
+          validator: validator,
+          obscureText: obscureText,
+          onChanged: onChanged,
+          onEditingComplete: onEditingComplete,
+          onFieldSubmitted: onFieldSubmitted,
+          onSaved: onSaved,
+          onTap: onTap,
+          cursorColor: cursorColor,
+          cursorErrorColor: cursorErrorColor,
+          cursorHeight: cursorHeight,
+          controller: controller,
+          style: TextStyle(height: textStyleHeight, color: textColor),
+          decoration: InputDecoration(
+            prefixIcon: prefixIcon,
+            prefixIconColor: prefixIconColor,
+            hintStyle: TextStyle(color: hintTextColor),
+            contentPadding: contentPadding,
+            fillColor: fillColor,
+            hintText: hintText,
+            filled: filled,
+            border: OutlineInputBorder(
+              borderRadius: borderRadius,
+              borderSide: borderSide,
+            ),
           ),
-          contentPadding: contentPadding,
-          fillColor: fillColor,
-          hintText: hintText,
-          filled: filled,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(borderRadius),
-            borderSide: borderSide,
-          ),
+          maxLines: maxLines,
         ),
       ),
     );
