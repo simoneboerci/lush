@@ -8,7 +8,17 @@ import 'package:lush_app/models/user_model.dart';
 import 'package:lush_app/models/chat_provider_exception.dart';
 import 'package:lush_app/models/message_model.dart';
 
-class ChatProvider with ChangeNotifier {
+abstract class IChatProvider {
+  Future<void> setChat(ChatModel chat);
+
+  Future<void> markAllMessagesAsRead();
+  Future<void> markAllMessagesAsDelivered();
+
+  Future<void> toggleFavoriteMessage(String messageId);
+  List<MessageModel> get currentUserFavoriteMessages;
+}
+
+class ChatProvider extends IChatProvider with ChangeNotifier {
   final IFirebaseHelper _firebaseHelper;
 
   ChatModel? _chat;
@@ -21,6 +31,7 @@ class ChatProvider with ChangeNotifier {
   ChatModel? get chat => _chat;
   List<UserModel> get participants => _participants;
 
+  @override
   Future<void> setChat(ChatModel chat) async {
     await _cleanupPreviousChat();
     await _initializeChat(chat);
@@ -71,6 +82,7 @@ class ChatProvider with ChangeNotifier {
     }
   }
 
+  @override
   Future<void> markAllMessagesAsRead() async {
     if (_chat == null) return;
 
@@ -81,6 +93,7 @@ class ChatProvider with ChangeNotifier {
     await _updateMessagesInFirebase(updatedMessages, MessageStatus.read);
   }
 
+  @override
   Future<void> markAllMessagesAsDelivered() async {
     if (_chat == null) return;
 
@@ -120,6 +133,41 @@ class ChatProvider with ChangeNotifier {
     } catch (e) {
       throw ChatProviderException('Error updating messages: $e');
     }
+  }
+
+  @override
+  Future<void> toggleFavoriteMessage(String messageId) async {
+    if (_chat == null) return;
+
+    final String currentUserId = _firebaseHelper.userHelper.currentUserUid!;
+
+    try {
+      await _firebaseHelper.chatsHelper
+          .toggleFavoriteMessage(_chat!.id, messageId, currentUserId);
+
+      final updatedMessages = _chat!.messages.map((message) {
+        if (message.id == messageId) {
+          Map<String, bool> updatedFavorites =
+              Map<String, bool>.from(message.favorites);
+
+          updatedFavorites[currentUserId] =
+              !message.isFavoriteForUser(currentUserId);
+          return message.copyWith(favorites: updatedFavorites);
+        }
+        return message;
+      }).toList();
+
+      _chat = _chat!.copyWith(messages: updatedMessages);
+      notifyListeners();
+    } catch (e) {
+      throw ChatProviderException('Error toggling favorite status: $e');
+    }
+  }
+
+  @override
+  List<MessageModel> get currentUserFavoriteMessages {
+    final String currentUserId = _firebaseHelper.userHelper.currentUserUid!;
+    return _chat?.getFavoriteMessagesForUser(currentUserId) ?? [];
   }
 
   @override

@@ -74,9 +74,9 @@ class _ReActionsOverlay extends StatelessWidget {
           children: [
             _buildBlurredBackground(),
             _buildMessageWidget(),
+            _buildDismissibleArea(),
             _buildReactionsOverlay(context),
             _buildActionsMenu(context),
-            _buildDismissibleArea(),
           ],
         ),
       ),

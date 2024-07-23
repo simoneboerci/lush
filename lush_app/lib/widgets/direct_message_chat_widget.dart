@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:provider/provider.dart';
 
@@ -84,11 +85,35 @@ class DirectMessageChatWidget extends StatelessWidget {
 
   List<ActionItemDirectOverlayWidget> _buildLongPressActions(
       BuildContext context, MessageModel message) {
+    final String currentUserId = FirebaseHelper().userHelper.currentUserUid!;
     return [
       ActionItemDirectOverlayWidget(
-        label: 'Aggiungi ai preferiti',
-        icon: Icons.bookmark_border,
-        onTap: () {},
+        label: message.isFavoriteForUser(currentUserId)
+            ? 'Rimuovi dai preferiti'
+            : 'Aggiungi ai preferiti',
+        icon: message.isFavoriteForUser(currentUserId)
+            ? Icons.bookmark
+            : Icons.bookmark_border,
+        onTap: () async {
+          print('ON TAPPP');
+          try {
+            await Provider.of<ChatProvider>(context, listen: false)
+                .toggleFavoriteMessage(message.id)
+                .then((_) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content: Text(message.isFavoriteForUser(currentUserId)
+                        ? 'Messaggio rimosso dai preferiti'
+                        : 'Messaggio aggiunto ai preferiti')),
+              );
+            });
+          } catch (e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                  content: Text('Errore nell\'aggiornare i preferiti')),
+            );
+          }
+        },
       ),
       ActionItemDirectOverlayWidget(
         label: 'Rispondi',
@@ -102,7 +127,13 @@ class DirectMessageChatWidget extends StatelessWidget {
       ActionItemDirectOverlayWidget(
         label: 'Copia',
         icon: Icons.content_copy,
-        onTap: () {},
+        onTap: () async {
+          await Clipboard.setData(ClipboardData(text: message.text)).then((_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Messaggio copiato negli appunti!')),
+            );
+          });
+        },
       ),
       ActionItemDirectOverlayWidget(
         label: 'Fissa',

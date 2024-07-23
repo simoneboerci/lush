@@ -13,6 +13,9 @@ abstract class IFirebaseChatsHelper {
   Future<void> sendMessage(String chatId, MessageModel message);
   Stream<List<ChatModel>> getUserChats(String userId);
   Future<void> updateMessage(String chatId, MessageModel message);
+
+  Future<void> toggleFavoriteMessage(
+      String chatId, String messageId, String userId);
 }
 
 // Classe che gestisce le operazioni di chats e messaggi tramite utenti e firebase
@@ -87,9 +90,9 @@ class FirebaseChatsHelper implements IFirebaseChatsHelper {
     // Converte lo snapshot in una mappa di stringhe e valori dinamici
     var data = snapshot.data() as Map<String, dynamic>?;
     // Verifica che la mappa (chat) esista e che contenga una lista di messaggi
-    if (data != null && data.containsKey(ChatModel.messagesLabel)) {
+    if (data != null && data.containsKey(ChatModelField.messages.name)) {
       // Crea una lista di oggetti dinamici (le mappe dei singoli messaggi)
-      List<dynamic> messagesData = data[ChatModel.messagesLabel];
+      List<dynamic> messagesData = data[ChatModelField.messages.name];
       // Ritorna una lista mappata di messaggi
       return messagesData
           .map((message) => MessageModel.fromMap(message))
@@ -110,18 +113,19 @@ class FirebaseChatsHelper implements IFirebaseChatsHelper {
     // Estrai l'array di messaggi
     final messageData = message.toMap();
     // Genera un id univoco per il nuovo messaggio
-    final messageId = chatRef.collection(ChatModel.messagesLabel).doc().id;
+    final messageId = chatRef.collection(ChatModelField.messages.name).doc().id;
 
     // Genera un id casuale per il messaggio corrente
-    messageData[MessageModel.idLabel] = messageId;
+    messageData[MessageModelField.id.name] = messageId;
     // Aggiorna lo stato del messaggio
-    messageData[MessageModel.statusLabel] = MessageStatus.sent.toStringValue();
+    messageData[MessageModelField.status.name] =
+        MessageStatus.sent.toStringValue();
 
     try {
       // Aggiorna il database
       await chatRef.update({
-        ChatModel.messagesLabel: FieldValue.arrayUnion([messageData]),
-        ChatModel.lastMessageIdLabel: messageId,
+        ChatModelField.messages.name: FieldValue.arrayUnion([messageData]),
+        ChatModelField.lastMessageId.name: messageId,
         // Altri campi legati al messaggio
       });
     } catch (e) {
@@ -138,7 +142,7 @@ class FirebaseChatsHelper implements IFirebaseChatsHelper {
     // Ottieni la lista di chat dal database filtrandole per partecipanti
     yield* _firestore
         .collection(firebaseChatsCollectionLabel)
-        .where(ChatModel.userIdsLabel, arrayContains: userId)
+        .where(ChatModelField.userIds.name, arrayContains: userId)
         .snapshots()
         // Mappa i dati in una lista di modelli di chat
         .map((snapshot) =>
@@ -166,10 +170,10 @@ class FirebaseChatsHelper implements IFirebaseChatsHelper {
 
       // Ottieni la lista di messaggi aggiornati
       final updatedMessages = _updateMessagesInList(
-          docSnapshot.data()?[ChatModel.messagesLabel] ?? [], message);
+          docSnapshot.data()?[ChatModelField.messages.name] ?? [], message);
 
       // Aggiorna la lista di messaggi nel database
-      await chatRef.update({ChatModel.messagesLabel: updatedMessages});
+      await chatRef.update({ChatModelField.messages.name: updatedMessages});
     } catch (e) {
       throw FirebaseChatException('Failed to update message: $e');
     }
@@ -192,12 +196,46 @@ class FirebaseChatsHelper implements IFirebaseChatsHelper {
 
     // Se il messaggio da aggiornare non è presente nella lista
     if (updatedMessages
-        .every((msg) => msg[MessageModel.idLabel] != updatedMessage.id)) {
+        .every((msg) => msg[MessageModelField.id.name] != updatedMessage.id)) {
       // Aggiungi un nuovo messaggio
       updatedMessages.add(updatedMessage.toMap());
     }
 
     // Ritorna la lista di messaggi aggiornata
     return updatedMessages;
+  }
+
+  @override
+  Future<void> toggleFavoriteMessage(
+      String chatId, String messageId, String userId) async {
+    try {
+      final chatRef =
+          _firestore.collection(firebaseChatsCollectionLabel).doc(chatId);
+
+      await _firestore.runTransaction((transaction) async {
+        final chatDoc = await transaction.get(chatRef);
+        final chatData = chatDoc.data();
+
+        if (chatData != null) {
+          List<dynamic> messages = chatData[ChatModelField.messages.name] ?? [];
+          int messageIndex = messages
+              .indexWhere((msg) => msg[MessageModelField.id.name] == messageId);
+
+          if (messageIndex != -1) {
+            Map<String, bool> favorites = Map<String, bool>.from(
+                messages[messageIndex][MessageModelField.favorites.name] ?? {});
+            favorites[userId] = !(favorites[userId] ?? false);
+
+            messages[messageIndex][MessageModelField.favorites.name] =
+                favorites;
+
+            transaction
+                .update(chatRef, {ChatModelField.messages.name: messages});
+          }
+        }
+      });
+    } catch (e) {
+      throw FirebaseChatException('Failed to toggle favorite message: $e');
+    }
   }
 }

@@ -4,17 +4,34 @@ import 'package:equatable/equatable.dart';
 
 import 'package:lush_app/models/message_model.dart';
 
+enum ChatModelField {
+  id,
+  userIds,
+  messages,
+  lastMessageId,
+}
+
+abstract class IChatModel extends Equatable {
+  Map<String, dynamic> toMap();
+  ChatModel copyWith({
+    String? id,
+    List<String>? userIds,
+    List<MessageModel>? messages,
+    String? lastMessageId,
+  });
+
+  MessageModel? getMessageFromId(String messageId);
+  int getUnreadMessagesCount(String userId);
+
+  List<MessageModel> getFavoriteMessagesForUser(String userId);
+}
+
 @immutable
-class ChatModel extends Equatable {
+class ChatModel extends IChatModel {
   final String id;
   final List<String> userIds;
   final List<MessageModel> messages;
   final String? lastMessageId;
-
-  static const String idLabel = 'id';
-  static const String userIdsLabel = 'user_ids';
-  static const String messagesLabel = 'messages';
-  static const String lastMessageIdLabel = 'last_message_id';
 
   ChatModel({
     required this.id,
@@ -26,26 +43,28 @@ class ChatModel extends Equatable {
 
   factory ChatModel.fromMap(Map<String, dynamic> map) {
     return ChatModel(
-      id: map[idLabel] as String? ?? '',
-      userIds: List<String>.from(map[userIdsLabel] ?? []),
-      messages: (map[messagesLabel] as List<dynamic>?)
+      id: map[ChatModelField.id.name] as String? ?? '',
+      userIds: List<String>.from(map[ChatModelField.userIds.name] ?? []),
+      messages: (map[ChatModelField.messages.name] as List<dynamic>?)
               ?.map(
                   (item) => MessageModel.fromMap(item as Map<String, dynamic>))
               .toList() ??
           [],
-      lastMessageId: map[lastMessageIdLabel] as String?,
+      lastMessageId: map[ChatModelField.lastMessageId.name] as String?,
     );
   }
 
+  @override
   Map<String, dynamic> toMap() {
     return {
-      idLabel: id,
-      userIdsLabel: userIds,
-      messagesLabel: messages.map((msg) => msg.toMap()).toList(),
-      lastMessageIdLabel: lastMessageId,
+      ChatModelField.id.name: id,
+      ChatModelField.userIds.name: userIds,
+      ChatModelField.messages.name: messages.map((msg) => msg.toMap()).toList(),
+      ChatModelField.lastMessageId.name: lastMessageId,
     };
   }
 
+  @override
   ChatModel copyWith({
     String? id,
     List<String>? userIds,
@@ -60,19 +79,28 @@ class ChatModel extends Equatable {
     );
   }
 
-  MessageModel? getMessage(String id) {
+  @override
+  MessageModel? getMessageFromId(String messageId) {
     try {
-      return messages.firstWhere((message) => message.id == id);
+      return messages.firstWhere((message) => message.id == messageId);
     } on StateError {
       return null;
     }
   }
 
+  @override
   int getUnreadMessagesCount(String userId) {
     return messages
         .where((message) =>
             message.senderId != userId && message.status != MessageStatus.read)
         .length;
+  }
+
+  @override
+  List<MessageModel> getFavoriteMessagesForUser(String userId) {
+    return messages
+        .where((message) => message.isFavoriteForUser(userId))
+        .toList();
   }
 
   @override

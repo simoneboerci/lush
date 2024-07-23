@@ -47,7 +47,7 @@ class ContactListTileWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final lastMessage = chat.lastMessageId != null
-        ? chat.getMessage(chat.lastMessageId!)
+        ? chat.getMessageFromId(chat.lastMessageId!)
         : null;
 
     return Padding(
