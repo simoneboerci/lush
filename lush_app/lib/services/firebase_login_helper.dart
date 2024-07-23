@@ -142,11 +142,11 @@ class FirebaseLoginHelper implements IFirebaseLoginHelper {
         email: email ?? credential.user!.email,
         password: password,
       ),
-      personalInfo: UserPersonalInfoModel(),
+      personalInfo: const UserPersonalInfoModel(),
       chatInfo: UserChatInfoModel.online().copyWith(
         username: username ?? credential.user!.displayName,
       ),
-      purchaseInfo: UserPurchaseInfoModel(),
+      purchaseInfo: const UserPurchaseInfoModel(),
     );
   }
 }

@@ -94,6 +94,7 @@ class FirebaseUserHelper implements IFirebaseUserHelper {
   }
 
   // Metodo per ottenere una lista di utenti registrati in base a una query di testo
+  @override
   Future<List<UserModel>> getUsersByQuery(
     String query, {
     bool skipCurrentUser = true,

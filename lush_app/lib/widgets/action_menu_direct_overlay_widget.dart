@@ -5,24 +5,16 @@ import 'package:lush_app/widgets/action_item_direct_overlay_widget.dart';
 class ActionMenuDirectOverlayWidget extends StatelessWidget {
   const ActionMenuDirectOverlayWidget({
     super.key,
-    required this.isMyMessage,
-    required this.messageOffset,
-    required this.messageHeight,
     required this.actions,
     this.width = 240.0,
-    this.margin = const EdgeInsets.symmetric(
-      horizontal: 16.0,
-      vertical: 4.0,
-    ),
+    this.margin = const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
     this.borderRadius = 16.0,
     this.padding = const EdgeInsets.all(4.0),
     this.backgroundColor = Colors.white,
     this.backgroundColorOpacity = 0.2,
+    this.distanceFromMessage = 0.0,
   });
 
-  final bool isMyMessage;
-  final Offset messageOffset;
-  final double messageHeight;
   final List<ActionItemDirectOverlayWidget> actions;
   final double width;
   final EdgeInsets margin;
@@ -30,101 +22,7 @@ class ActionMenuDirectOverlayWidget extends StatelessWidget {
   final Color backgroundColor;
   final double backgroundColorOpacity;
   final double borderRadius;
-
-  @override
-  Widget build(BuildContext context) {
-    return _ActionMenuPositioned(
-      isMyMessage: isMyMessage,
-      messageOffset: messageOffset,
-      messageHeight: messageHeight,
-      child: _ActionMenuContainer(
-        width: width,
-        margin: margin,
-        borderRadius: borderRadius,
-        padding: padding,
-        backgroundColor: backgroundColor,
-        backgroundColorOpacity: backgroundColorOpacity,
-        actions: actions,
-      ),
-    );
-  }
-}
-
-class _ActionMenuPositioned extends StatefulWidget {
-  const _ActionMenuPositioned({
-    required this.isMyMessage,
-    required this.messageOffset,
-    required this.messageHeight,
-    required this.child,
-  });
-
-  final bool isMyMessage;
-  final Offset messageOffset;
-  final double messageHeight;
-  final Widget child;
-
-  @override
-  State<StatefulWidget> createState() => _ActionMenuPositionedState();
-}
-
-class _ActionMenuPositionedState extends State<_ActionMenuPositioned> {
-  final GlobalKey _containerKey = GlobalKey();
-  double _leftPosition = 0.0;
-  double _widgetOpacity = 0.0;
-
-  @override
-  void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) => _updatePosition());
-    super.initState();
-  }
-
-  void _updatePosition() {
-    final renderBox =
-        _containerKey.currentContext?.findRenderObject() as RenderBox?;
-
-    if (renderBox != null) {
-      final screenWidth = MediaQuery.of(context).size.width;
-      setState(() {
-        _leftPosition = widget.isMyMessage
-            ? screenWidth - renderBox.size.width
-            : widget.messageOffset.dx;
-        _widgetOpacity = 1.0;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Opacity(
-      opacity: _widgetOpacity,
-      child: Positioned(
-        key: _containerKey,
-        left: _leftPosition,
-        top: widget.messageOffset.dy + widget.messageHeight,
-        child: widget.child,
-      ),
-    );
-  }
-}
-
-class _ActionMenuContainer extends StatelessWidget {
-  const _ActionMenuContainer({
-    required this.width,
-    required this.margin,
-    required this.borderRadius,
-    required this.padding,
-    required this.backgroundColor,
-    required this.backgroundColorOpacity,
-    required this.actions,
-  });
-
-  final double width;
-  final EdgeInsets? margin;
-  final double borderRadius;
-  final EdgeInsets? padding;
-  final Color? backgroundColor;
-  final double backgroundColorOpacity;
-  final List<ActionItemDirectOverlayWidget> actions;
+  final double distanceFromMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +31,7 @@ class _ActionMenuContainer extends StatelessWidget {
       margin: margin,
       padding: padding,
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: backgroundColor.withOpacity(backgroundColorOpacity),
         borderRadius: BorderRadius.circular(borderRadius),
       ),
       child: Column(
@@ -144,6 +42,99 @@ class _ActionMenuContainer extends StatelessWidget {
           ...actions,
         ],
       ),
+    );
+  }
+}
+
+class ActionMenuDirectOverlayPositioner extends StatefulWidget {
+  const ActionMenuDirectOverlayPositioner({
+    super.key,
+    required this.child,
+    required this.isMe,
+    required this.messagePosition,
+    required this.messageSize,
+  });
+
+  final Widget child;
+  final bool isMe;
+  final Offset messagePosition;
+  final Size messageSize;
+
+  @override
+  State<ActionMenuDirectOverlayPositioner> createState() =>
+      _ActionMenuDirectOverlayPositionerState();
+}
+
+class _ActionMenuDirectOverlayPositionerState
+    extends State<ActionMenuDirectOverlayPositioner> {
+  final GlobalKey _childKey = GlobalKey();
+  Size? _childSize;
+  Offset? _position;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _updateChildSizeAndPosition());
+  }
+
+  @override
+  void didUpdateWidget(ActionMenuDirectOverlayPositioner oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.messagePosition != widget.messagePosition ||
+        oldWidget.messageSize != widget.messageSize) {
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => _updateChildSizeAndPosition());
+    }
+  }
+
+  void _updateChildSizeAndPosition() {
+    final RenderBox? renderBox =
+        _childKey.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox != null && mounted) {
+      final Size newSize = renderBox.size;
+      final Offset newPosition = _calculatePosition(newSize);
+
+      setState(() {
+        _childSize = newSize;
+        _position = newPosition;
+      });
+    }
+  }
+
+  Offset _calculatePosition(Size childSize) {
+    double left;
+    if (widget.isMe) {
+      left = widget.messagePosition.dx +
+          widget.messageSize.width -
+          childSize.width;
+    } else {
+      left = widget.messagePosition.dx;
+    }
+
+    double top = widget.messagePosition.dy +
+        widget.messageSize.height +
+        (widget.child as ActionMenuDirectOverlayWidget).distanceFromMessage;
+
+    return Offset(left, top);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        if (_position == null || _childSize == null)
+          Opacity(
+            opacity: 0,
+            child: Container(key: _childKey, child: widget.child),
+          ),
+        if (_position != null && _childSize != null)
+          Positioned(
+            left: _position!.dx,
+            top: _position!.dy,
+            child: widget.child,
+          ),
+      ],
     );
   }
 }

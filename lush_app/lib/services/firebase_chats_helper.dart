@@ -41,7 +41,7 @@ class FirebaseChatsHelper implements IFirebaseChatsHelper {
     ChatModel newChat = ChatModel(
       id: chatId,
       userIds: [user1Id, user2Id],
-      messages: [],
+      messages: const [],
     );
 
     try {

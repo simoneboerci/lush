@@ -1,7 +1,5 @@
 import 'dart:ui';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 import 'package:lush_app/widgets/action_item_direct_overlay_widget.dart';
 import 'package:lush_app/widgets/action_menu_direct_overlay_widget.dart';
@@ -76,8 +74,8 @@ class _ReActionsOverlay extends StatelessWidget {
           children: [
             _buildBlurredBackground(),
             _buildMessageWidget(),
-            _buildReactionsOverlay(),
-            _buildActionsMenu(),
+            _buildReactionsOverlay(context),
+            _buildActionsMenu(context),
             _buildDismissibleArea(),
           ],
         ),
@@ -107,19 +105,21 @@ class _ReActionsOverlay extends StatelessWidget {
     );
   }
 
-  Widget _buildReactionsOverlay() {
-    return ReactionsDirectOverlayWidget(
-      isMyMessage: isMe,
-      messageOffset: messagePosition,
+  Widget _buildReactionsOverlay(BuildContext context) {
+    return ReactionsDirectOverlayPositioner(
+      isMe: isMe,
+      messagePosition: messagePosition,
+      messageSize: messageSize,
+      child: const ReactionsDirectOverlayWidget(),
     );
   }
 
-  Widget _buildActionsMenu() {
-    return ActionMenuDirectOverlayWidget(
-      isMyMessage: isMe,
-      messageOffset: messagePosition,
-      messageHeight: messageSize.height,
-      actions: actions,
+  Widget _buildActionsMenu(BuildContext context) {
+    return ActionMenuDirectOverlayPositioner(
+      isMe: isMe,
+      messagePosition: messagePosition,
+      messageSize: messageSize,
+      child: ActionMenuDirectOverlayWidget(actions: actions),
     );
   }
 
