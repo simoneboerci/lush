@@ -1,9 +1,12 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:lush_app/features/chat/presentation/viewmodels/message_reactions_menu_overlay_positioner_view_model.dart';
+import 'package:lush_app/features/chat/presentation/viewmodels/message_reactions_menu_overlay_widget_view_model.dart';
 
-import 'package:lush_app/widgets/action_item_direct_overlay_widget.dart';
+import 'package:lush_app/features/chat/presentation/widgets/action_item_direct_overlay_widget.dart';
+import 'package:lush_app/features/chat/presentation/widgets/message_reactions_menu_overlay_positioner.dart';
 import 'package:lush_app/widgets/action_menu_direct_overlay_widget.dart';
-import 'package:lush_app/widgets/reactions_direct_overlay_widget.dart';
+import 'package:lush_app/features/chat/presentation/widgets/message_reactions_menu_overlay_widget.dart';
 
 class ReActionsDirectOverlayWidget {
   static OverlayEntry show({
@@ -106,11 +109,15 @@ class _ReActionsOverlay extends StatelessWidget {
   }
 
   Widget _buildReactionsOverlay(BuildContext context) {
-    return ReactionsDirectOverlayPositioner(
-      isMe: isMe,
-      messagePosition: messagePosition,
-      messageSize: messageSize,
-      child: const ReactionsDirectOverlayWidget(),
+    return MessageReactionsMenuOverlayPositioner(
+      viewModel: MessageReactionsMenuOverlayPositionerViewModel(
+        isMe: isMe,
+        messagePosition: messagePosition,
+        messageSize: messageSize,
+      ),
+      child: const MessageReactionsMenuOverlayWidget(
+        viewModel: MessageReactionsMenuOverlayWidgetViewModel(),
+      ),
     );
   }
 

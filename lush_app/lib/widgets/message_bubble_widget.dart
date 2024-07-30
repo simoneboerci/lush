@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:lush_app/features/chat/domain/entities/message.dart';
 import 'package:video_player/video_player.dart';
 
-import 'package:lush_app/constants/colors.dart';
+import 'package:lush_app/core/constants/colors.dart';
 
-import 'package:lush_app/models/message_model.dart';
-
-import 'package:lush_app/widgets/action_item_direct_overlay_widget.dart';
-import 'package:lush_app/widgets/custom_text.dart';
+import 'package:lush_app/features/chat/presentation/widgets/action_item_direct_overlay_widget.dart';
+import 'package:lush_app/core/commons/widgets/custom_text.dart';
 import 'package:lush_app/widgets/re_actions_direct_overlay_widget.dart';
 
 class MessageBubbleWidget extends StatelessWidget {
@@ -19,7 +18,7 @@ class MessageBubbleWidget extends StatelessWidget {
     this.style = const MessageBubbleStyle(),
   });
 
-  final MessageModel message;
+  final Message message;
   final bool isMe;
   final Function(String) onReplyTap;
   final List<ActionItemDirectOverlayWidget> onLongPressActions;
@@ -75,7 +74,7 @@ class _MessageContent extends StatelessWidget {
     required this.onReplyTap,
   });
 
-  final MessageModel message;
+  final Message message;
   final bool isMe;
   final MessageBubbleStyle style;
   final Function(String) onReplyTap;
@@ -197,7 +196,7 @@ class _RepliedMessage extends StatelessWidget {
     required this.onReplyTap,
   });
 
-  final MessageModel repliedMessage;
+  final Message repliedMessage;
   final MessageBubbleStyle style;
   final Function(String) onReplyTap;
 
@@ -240,7 +239,7 @@ class _MessageText extends StatelessWidget {
     required this.style,
   });
 
-  final MessageModel message;
+  final Message message;
   final bool isMe;
   final MessageBubbleStyle style;
 
@@ -263,7 +262,7 @@ class _MessageTimestamp extends StatelessWidget {
     required this.style,
   });
 
-  final MessageModel message;
+  final Message message;
   final bool isMe;
   final MessageBubbleStyle style;
 
