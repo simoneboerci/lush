@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:lush_app/widgets/action_item_direct_overlay_widget.dart';
+import 'package:lush_app/features/chat/presentation/widgets/action_item_direct_overlay_widget.dart';
 
 class ActionMenuDirectOverlayWidget extends StatelessWidget {
   const ActionMenuDirectOverlayWidget({

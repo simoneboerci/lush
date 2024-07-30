@@ -1,0 +1,117 @@
+import 'package:flutter/material.dart';
+import 'package:lush_app/core/commons/widgets/disable_widget.dart';
+
+import 'package:lush_app/core/constants/colors.dart';
+import 'package:lush_app/core/constants/images.dart';
+
+class CustomElevatedButton extends StatelessWidget {
+  final EdgeInsets padding;
+  final Color? backgroundColor;
+  final Size? minimumSize;
+  final Function()? onPressed;
+  final String text;
+  final Color? textColor;
+  final FontWeight fontWeight;
+  final double fontSize;
+  final String? fontFamily;
+  final bool googleButton;
+  final bool disable;
+  final Color disableBackgroundColor;
+  final Color disableForegroundColor;
+  final double? elevation;
+
+  const CustomElevatedButton({
+    super.key,
+    this.padding = const EdgeInsets.all(8.0),
+    this.backgroundColor = cPrimaryColor,
+    this.minimumSize = const Size.fromHeight(60.0),
+    this.onPressed,
+    this.text = '',
+    this.textColor = Colors.white,
+    this.fontWeight = FontWeight.bold,
+    this.fontSize = 18.0,
+    this.fontFamily = 'Playfair Display',
+    this.googleButton = false,
+    this.disable = false,
+    this.disableBackgroundColor = cSurfaceColor,
+    this.disableForegroundColor = Colors.white,
+    this.elevation,
+  });
+
+  const CustomElevatedButton.variant({
+    super.key,
+    this.padding = const EdgeInsets.all(8.0),
+    this.backgroundColor = cSecondaryColor,
+    this.minimumSize = const Size.fromHeight(60.0),
+    this.onPressed,
+    this.text = '',
+    this.textColor = const Color(0xFF121212),
+    this.fontWeight = FontWeight.bold,
+    this.fontSize = 18.0,
+    this.fontFamily = 'Playfair Display',
+    this.googleButton = false,
+    this.disable = false,
+    this.disableBackgroundColor = cSurfaceColor,
+    this.disableForegroundColor = Colors.white,
+    this.elevation,
+  });
+
+  const CustomElevatedButton.google({
+    super.key,
+    this.padding = const EdgeInsets.all(8.0),
+    this.backgroundColor = Colors.white,
+    this.minimumSize = const Size.fromHeight(60.0),
+    this.onPressed,
+    this.text = '',
+    this.textColor = const Color(0xFF121212),
+    this.fontWeight = FontWeight.normal,
+    this.fontSize = 16.0,
+    this.fontFamily = 'Roboto',
+    this.googleButton = true,
+    this.disable = false,
+    this.disableBackgroundColor = cSurfaceColor,
+    this.disableForegroundColor = Colors.white,
+    this.elevation,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: padding,
+      child: DisableWidget(
+        isDisabled: disable,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            elevation: elevation,
+            disabledBackgroundColor: disableBackgroundColor,
+            disabledForegroundColor: disableForegroundColor,
+            backgroundColor: backgroundColor,
+            minimumSize: minimumSize,
+          ),
+          onPressed: disable == true ? null : onPressed,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              googleButton
+                  ? const Image(
+                      width: 28.0,
+                      image: cGoogleIconImage,
+                    )
+                  : Container(),
+              Text(
+                text,
+                style: TextStyle(
+                  color: disable == true ? disableForegroundColor : textColor,
+                  fontFamily: fontFamily,
+                  fontWeight: fontWeight,
+                  fontSize: fontSize,
+                ),
+              ),
+              googleButton ? const SizedBox(width: 28.0) : Container(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
