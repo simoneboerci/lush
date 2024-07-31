@@ -5,6 +5,7 @@ import 'package:lush_app/core/utils/show_snackbar.dart';
 import 'package:lush_app/features/collections/domain/entities/collection_card.dart';
 import 'package:lush_app/features/collections/presentation/bloc/collection_bloc.dart';
 import 'package:lush_app/features/collections/presentation/bloc/collection_states.dart';
+import 'package:lush_app/features/collections/presentation/viewmodels/overlay_card_widget_view_model.dart';
 import 'package:lush_app/features/collections/presentation/widgets/collection_grid_view_item_widget.dart';
 import 'package:lush_app/features/collections/presentation/widgets/overlay_card_widget.dart';
 
@@ -13,6 +14,7 @@ class CollectionGridViewWidget extends StatelessWidget {
   final double mainAxisSpacing;
   final double crossAxisSpacing;
   final double childAspectRatio;
+  final double overlayBackgroundColorOpacity;
 
   const CollectionGridViewWidget({
     super.key,
@@ -20,6 +22,7 @@ class CollectionGridViewWidget extends StatelessWidget {
     this.mainAxisSpacing = 8.0,
     this.crossAxisSpacing = 16.0,
     this.childAspectRatio = 0.8,
+    this.overlayBackgroundColorOpacity = 0.5,
   });
 
   @override
@@ -57,7 +60,8 @@ class CollectionGridViewWidget extends StatelessWidget {
     showDialog(
         context: context,
         builder: (context) => Dialog(
-              backgroundColor: Colors.black.withOpacity(0.5),
+              backgroundColor:
+                  Colors.black.withOpacity(overlayBackgroundColorOpacity),
               insetPadding: EdgeInsets.zero,
               child: Stack(
                 fit: StackFit.expand,
@@ -69,7 +73,9 @@ class CollectionGridViewWidget extends StatelessWidget {
                     ),
                   ),
                   Center(
-                    child: OverlayCardWidget(card: card),
+                    child: OverlayCardWidget(
+                      viewModel: OverlayCardWidgetViewModel(card: card),
+                    ),
                   ),
                 ],
               ),
