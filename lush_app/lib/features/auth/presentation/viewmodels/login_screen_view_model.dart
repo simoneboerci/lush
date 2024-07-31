@@ -47,7 +47,7 @@ class LoginScreenViewModel {
   }
 
   void goToMainScreen(BuildContext context) {
-    Navigator.pushReplacementNamed(context, cChatsScreen);
+    Navigator.pushReplacementNamed(context, cCollectionScreen);
   }
 
   // Internal logic

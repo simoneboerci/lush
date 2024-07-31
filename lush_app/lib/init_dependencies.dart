@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:lush_app/core/commons/user/domain/usecases/complete_user_creation_use_case.dart';
@@ -34,6 +35,13 @@ import 'package:lush_app/core/commons/user/domain/usecases/delete_user_use_case.
 import 'package:lush_app/core/commons/user/domain/usecases/get_user_by_id_use_case.dart';
 import 'package:lush_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:lush_app/core/commons/user/presentation/bloc/user_bloc.dart';
+import 'package:lush_app/features/collections/data/datasources/collection_remote_data_source.dart';
+import 'package:lush_app/features/collections/data/datasources/collection_remote_data_source_impl.dart';
+import 'package:lush_app/features/collections/data/repositories/collection_repository_impl.dart';
+import 'package:lush_app/features/collections/domain/repositories/collection_repository.dart';
+import 'package:lush_app/features/collections/domain/usecases/get_collection_card_use_case.dart';
+import 'package:lush_app/features/collections/domain/usecases/get_collection_use_case.dart';
+import 'package:lush_app/features/collections/presentation/bloc/collection_bloc.dart';
 import 'package:lush_app/firebase_options.dart';
 
 final serviceLocator = GetIt.instance;
@@ -43,10 +51,12 @@ Future<void> initDependencies() async {
 
   serviceLocator.registerLazySingleton(() => FirebaseFirestore.instance);
   serviceLocator.registerLazySingleton(() => FirebaseAuth.instance);
+  serviceLocator.registerLazySingleton(() => FirebaseStorage.instance);
   serviceLocator.registerLazySingleton(() => GoogleSignIn());
 
   _initUserDependencies();
   _initAuthDependencies();
+  _initCollectionDependencies();
 }
 
 void _initUserDependencies() {
@@ -138,6 +148,29 @@ void _initAuthDependencies() {
         loginWithEmailAndPasswordUseCase: serviceLocator(),
         loginWithGoogleUseCase: serviceLocator(),
         loginAnonymouslyUseCase: serviceLocator(),
+      ),
+    );
+}
+
+void _initCollectionDependencies() {
+  //Data sources
+  serviceLocator
+    ..registerFactory<CollectionRemoteDataSource>(
+        () => CollectionRemoteDataSourceImpl())
+
+    //Repositories
+    ..registerFactory<CollectionRepository>(
+        () => CollectionRepositoryImpl(serviceLocator()))
+
+    //Use cases
+    ..registerFactory(() => GetCollectionUseCase(serviceLocator()))
+    ..registerFactory(() => GetCollectionCardUseCase(serviceLocator()))
+
+    //Bloc
+    ..registerLazySingleton(
+      () => CollectionBloc(
+        getCollectionUseCase: serviceLocator(),
+        getCollectionCardUseCase: serviceLocator(),
       ),
     );
 }
