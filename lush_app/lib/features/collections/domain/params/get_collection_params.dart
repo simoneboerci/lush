@@ -1,0 +1,3 @@
+class GetCollectionParams {
+  const GetCollectionParams();
+}

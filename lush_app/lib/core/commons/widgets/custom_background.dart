@@ -22,7 +22,7 @@ class CustomBackground extends StatelessWidget {
             gradient: kBackgroundGradient,
           ),
           padding: padding,
-          child: child ?? Container()),
+          child: SafeArea(child: child ?? Container())),
     );
   }
 }
