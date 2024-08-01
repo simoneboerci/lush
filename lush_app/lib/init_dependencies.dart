@@ -42,6 +42,14 @@ import 'package:lush_app/features/collections/domain/repositories/collection_rep
 import 'package:lush_app/features/collections/domain/usecases/get_collection_card_use_case.dart';
 import 'package:lush_app/features/collections/domain/usecases/get_collection_use_case.dart';
 import 'package:lush_app/features/collections/presentation/bloc/collection_bloc.dart';
+import 'package:lush_app/features/horizontal_videos/data/datasources/horizontal_video_data_source.dart';
+import 'package:lush_app/features/horizontal_videos/data/datasources/horizontal_video_data_source_impl.dart';
+import 'package:lush_app/features/horizontal_videos/data/repositories/horizontal_video_repository_impl.dart';
+import 'package:lush_app/features/horizontal_videos/domain/repositories/horizontal_video_repository.dart';
+import 'package:lush_app/features/horizontal_videos/domain/usecases/get_horizontal_video_by_id_use_case.dart';
+import 'package:lush_app/features/horizontal_videos/domain/usecases/get_horizontal_videos_use_case.dart';
+import 'package:lush_app/features/horizontal_videos/domain/usecases/upload_horizontal_video_use_case.dart';
+import 'package:lush_app/features/horizontal_videos/presentation/bloc/horizontal_video_bloc.dart';
 import 'package:lush_app/firebase_options.dart';
 
 final serviceLocator = GetIt.instance;
@@ -57,6 +65,7 @@ Future<void> initDependencies() async {
   _initUserDependencies();
   _initAuthDependencies();
   _initCollectionDependencies();
+  _initHorizontalVideoDependencies();
 }
 
 void _initUserDependencies() {
@@ -171,6 +180,31 @@ void _initCollectionDependencies() {
       () => CollectionBloc(
         getCollectionUseCase: serviceLocator(),
         getCollectionCardUseCase: serviceLocator(),
+      ),
+    );
+}
+
+void _initHorizontalVideoDependencies() {
+  // Data sources
+  serviceLocator
+    ..registerFactory<HorizontalVideoDataSource>(
+        () => HorizontalVideoDataSourceImpl())
+
+    // Repositories
+    ..registerFactory<HorizontalVideoRepository>(
+        () => HorizontalVideoRepositoryImpl(serviceLocator()))
+
+    // Usecases
+    ..registerFactory(() => GetHorizontalVideosUseCase(serviceLocator()))
+    ..registerFactory(() => GetHorizontalVideoByIdUseCase(serviceLocator()))
+    ..registerFactory(() => UploadHorizontalVideoUseCase(serviceLocator()))
+
+    // Bloc
+    ..registerLazySingleton(
+      () => HorizontalVideoBloc(
+        getHorizontalVideosUseCase: serviceLocator(),
+        getHorizontalVideoByIdUseCase: serviceLocator(),
+        uploadHorizontalVideoUseCase: serviceLocator(),
       ),
     );
 }

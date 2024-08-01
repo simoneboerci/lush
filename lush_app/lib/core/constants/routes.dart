@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lush_app/features/auth/presentation/pages/verification/first_step_verification_screen.dart';
 import 'package:lush_app/features/collections/presentation/pages/collection_screen.dart';
+import 'package:lush_app/features/horizontal_videos/presentation/pages/horizontal_video_player_screen.dart';
+import 'package:lush_app/features/horizontal_videos/presentation/pages/horizontal_videos_screen.dart';
 import 'package:lush_app/pages/chats_screen.dart';
 import 'package:lush_app/pages/direct_screen.dart';
 import 'package:lush_app/features/auth/presentation/pages/registration/fast_registration_screen.dart';
@@ -20,10 +22,12 @@ const String cLoginScreen = '/login_screen';
 const String cDirectScreen = '/direct_screen';
 const String cChatsScreen = '/chats_screen';
 const String cCollectionScreen = '/collection_screen';
+const String cHorizontalVideoScreen = '/horizontal_video_screen';
+const String cHorizontalVideoPlayerScreen = '/horizontal_video_player_screen';
 
 final Map<String, WidgetBuilder> routes = {
   cFastRegistrationScreen: (context) => FastRegistrationScreen(),
-  cCompleteRegistrationScreen: (context) => CompleteRegistrationScreen(),
+  cCompleteRegistrationScreen: (context) => const CompleteRegistrationScreen(),
   cFirstStepVerificationScreen: (context) => FirstStepVerificationScreen(),
   cSecondStepVerificationScreen: (context) => SecondStepVerificationScreen(),
   cThirdStepVerificationScreen: (context) => ThirdStepVerificationScreen(),
@@ -32,5 +36,8 @@ final Map<String, WidgetBuilder> routes = {
   cLoginScreen: (context) => LoginScreen(),
   cDirectScreen: (context) => const DirectScreen(),
   cChatsScreen: (context) => const ChatsScreen(),
-  cCollectionScreen: (context) => CollectionScreen(),
+  cCollectionScreen: (context) => const CollectionScreen(),
+  cHorizontalVideoScreen: (context) => const HorizontalVideosScreen(),
+  cHorizontalVideoPlayerScreen: (context) =>
+      const HorizontalVideoPlayerScreen(),
 };

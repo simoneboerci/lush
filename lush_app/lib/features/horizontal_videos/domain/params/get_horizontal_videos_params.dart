@@ -1,0 +1,3 @@
+class GetHorizontalVideosParams {
+  const GetHorizontalVideosParams();
+}

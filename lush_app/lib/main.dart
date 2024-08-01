@@ -3,9 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lush_app/core/commons/user/presentation/bloc/user_bloc.dart';
 import 'package:lush_app/core/constants/routes.dart';
 import 'package:lush_app/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:lush_app/features/auth/presentation/pages/login_screen.dart';
 import 'package:lush_app/features/collections/presentation/bloc/collection_bloc.dart';
-import 'package:lush_app/features/collections/presentation/pages/collection_screen.dart';
+import 'package:lush_app/features/horizontal_videos/presentation/bloc/horizontal_video_bloc.dart';
+import 'package:lush_app/features/horizontal_videos/presentation/pages/horizontal_videos_screen.dart';
 import 'package:lush_app/init_dependencies.dart';
 
 void main() async {
@@ -26,11 +26,12 @@ class MyApp extends StatelessWidget {
         //BlocProvider(create: (_) => serviceLocator<ChatBloc>()),
         //BlocProvider(create: (_) => serviceLocator<MessageBloc>()),
         BlocProvider(create: (_) => serviceLocator<CollectionBloc>()),
+        BlocProvider(create: (_) => serviceLocator<HorizontalVideoBloc>()),
       ],
       child: MaterialApp(
         theme: ThemeData(fontFamily: 'Montserrat'),
         title: 'Lush',
-        home: CollectionScreen(
+        home: HorizontalVideosScreen(
             /*BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
             if (state is AuthErrorState) {
