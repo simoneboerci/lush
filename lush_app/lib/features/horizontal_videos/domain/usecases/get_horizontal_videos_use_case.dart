@@ -14,6 +14,7 @@ class GetHorizontalVideosUseCase
   @override
   Future<Either<Failure, List<HorizontalVideo>>> call(
       GetHorizontalVideosParams params) async {
-    return await horizontalVideoRepository.getHorizontalVideos();
+    return await horizontalVideoRepository.getHorizontalVideos(
+        lastVideoId: params.lastVideoId);
   }
 }

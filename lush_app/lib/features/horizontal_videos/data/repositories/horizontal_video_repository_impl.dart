@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:lush_app/core/exceptions/horizontal_video_exceptions.dart';
 import 'package:lush_app/core/failure.dart';
 import 'package:lush_app/features/horizontal_videos/data/datasources/horizontal_video_data_source.dart';
 import 'package:lush_app/features/horizontal_videos/data/models/horizontal_video_model.dart';
@@ -31,12 +32,15 @@ class HorizontalVideoRepositoryImpl implements HorizontalVideoRepository {
   }
 
   @override
-  Future<Either<Failure, List<HorizontalVideo>>> getHorizontalVideos() async {
+  Future<Either<Failure, List<HorizontalVideo>>> getHorizontalVideos(
+      {String? lastVideoId}) async {
     try {
-      final videoModels = await horizontalVideoDataSource.getHorizontalVideos();
+      final videoModels = await horizontalVideoDataSource.getHorizontalVideos(
+          lastVideoId: lastVideoId);
       final videos = videoModels.map((model) => toEntity(model)).toList();
+
       return right(videos);
-    } catch (e) {
+    } on HorizontalVideoException catch (e) {
       return left(Failure(message: e.toString()));
     }
   }
@@ -48,7 +52,7 @@ class HorizontalVideoRepositoryImpl implements HorizontalVideoRepository {
       final videoModel =
           await horizontalVideoDataSource.getHorizontalVideoById(id);
       return right(toEntity(videoModel));
-    } catch (e) {
+    } on HorizontalVideoException catch (e) {
       return left(Failure(message: e.toString()));
     }
   }
@@ -63,8 +67,9 @@ class HorizontalVideoRepositoryImpl implements HorizontalVideoRepository {
     try {
       final videoModel = await horizontalVideoDataSource.uploadHorizontalVideo(
           filePath, fileName, thumbnailUrl, title);
+
       return right(toEntity(videoModel));
-    } catch (e) {
+    } on HorizontalVideoException catch (e) {
       return left(Failure(message: e.toString()));
     }
   }

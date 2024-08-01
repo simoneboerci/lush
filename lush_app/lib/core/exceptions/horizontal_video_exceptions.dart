@@ -2,6 +2,9 @@ final class HorizontalVideoException implements Exception {
   final String message;
 
   const HorizontalVideoException(this.message);
+
+  @override
+  String toString() => message;
 }
 
 final class HorizontalVideoNotFoundException extends HorizontalVideoException {

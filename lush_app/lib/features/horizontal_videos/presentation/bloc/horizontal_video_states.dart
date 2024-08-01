@@ -25,6 +25,15 @@ final class HorizontalVideosLoadedState extends HorizontalVideoState {
   List<Object?> get props => [horizontalVideos];
 }
 
+final class HorizontalVideosLoadingMoreState extends HorizontalVideoState {
+  final List<HorizontalVideo> loadedVideos;
+
+  const HorizontalVideosLoadingMoreState(this.loadedVideos);
+
+  @override
+  List<Object?> get props => [loadedVideos];
+}
+
 final class HorizontalVideoLoadingState extends HorizontalVideoState {
   const HorizontalVideoLoadingState();
 }

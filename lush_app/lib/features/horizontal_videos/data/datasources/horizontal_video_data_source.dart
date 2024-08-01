@@ -1,7 +1,7 @@
 import 'package:lush_app/features/horizontal_videos/data/models/horizontal_video_model.dart';
 
 abstract interface class HorizontalVideoDataSource {
-  Future<List<HorizontalVideoModel>> getHorizontalVideos();
+  Future<List<HorizontalVideoModel>> getHorizontalVideos({String? lastVideoId});
   Future<HorizontalVideoModel> getHorizontalVideoById(String id);
 
   Future<String> uploadHorizontalVideoThumbnail(

@@ -17,10 +17,20 @@ class HorizontalVideosScreen extends StatefulWidget {
 }
 
 class HorizontalVideosScreenState extends State<HorizontalVideosScreen> {
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
-    super.initState();
     context.read<HorizontalVideoBloc>().add(const GetHorizontalVideosEvent());
+    _scrollController.addListener(_onScroll);
+    super.initState();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent) {
+      context.read<HorizontalVideoBloc>().add(const GetHorizontalVideosEvent());
+    }
   }
 
   @override
@@ -39,19 +49,28 @@ class HorizontalVideosScreenState extends State<HorizontalVideosScreen> {
               builder: (context, state) {
                 if (state is HorizontalVideosLoadingState) {
                   return const CustomLoader();
-                } else if (state is HorizontalVideosLoadedState) {
+                } else if (state is HorizontalVideosLoadedState ||
+                    state is HorizontalVideosLoadingMoreState) {
+                  final videos = state is HorizontalVideosLoadedState
+                      ? state.horizontalVideos
+                      : (state as HorizontalVideosLoadingMoreState)
+                          .loadedVideos;
+
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 30.0),
                     child: ListView.builder(
-                      itemCount: state.horizontalVideos.length,
-                      itemBuilder: (context, index) =>
-                          HorizontalVideoListItemWidget(
-                        video: state.horizontalVideos[index],
-                      ),
-                    ),
+                        controller: _scrollController,
+                        itemCount: videos.length +
+                            (state is HorizontalVideosLoadingMoreState ? 1 : 0),
+                        itemBuilder: (context, index) {
+                          if (index == videos.length) {
+                            return const CustomLoader();
+                          }
+                          return HorizontalVideoListItemWidget(
+                            video: videos[index],
+                          );
+                        }),
                   );
-                } else if (state is HorizontalVideoErrorState) {
-                  return Center(child: Text(state.message));
                 }
                 return const Center(child: Text('Unknown error occurred'));
               },
@@ -60,5 +79,11 @@ class HorizontalVideosScreenState extends State<HorizontalVideosScreen> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 }

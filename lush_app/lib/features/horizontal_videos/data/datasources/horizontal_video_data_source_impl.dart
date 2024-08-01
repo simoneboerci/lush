@@ -11,20 +11,36 @@ class HorizontalVideoDataSourceImpl implements HorizontalVideoDataSource {
   final FirebaseFirestore _firestore;
   final FirebaseStorage _storage;
 
+  static const int _pageSize = 10;
+
   HorizontalVideoDataSourceImpl(
       {FirebaseFirestore? firestore, FirebaseStorage? storage})
       : _firestore = firestore ?? FirebaseFirestore.instance,
         _storage = storage ?? FirebaseStorage.instance;
 
   @override
-  Future<List<HorizontalVideoModel>> getHorizontalVideos() async {
+  Future<List<HorizontalVideoModel>> getHorizontalVideos(
+      {String? lastVideoId}) async {
     try {
-      final querySnapshot = await _firestore
+      Query query = _firestore
           .collection(FirebaseCollectionsLabels.horizontalVideos)
-          .get();
+          .orderBy(HorizontalVideoModelField.id.name)
+          .limit(_pageSize);
+
+      if (lastVideoId != null) {
+        final lastDocSnapshot = await _firestore
+            .collection(FirebaseCollectionsLabels.horizontalVideos)
+            .doc(lastVideoId)
+            .get();
+
+        query = query.startAfterDocument(lastDocSnapshot);
+      }
+
+      final querySnapshot = await query.get();
 
       return querySnapshot.docs
-          .map((doc) => HorizontalVideoModel.fromMap(doc.data()))
+          .map((doc) =>
+              HorizontalVideoModel.fromMap(doc.data() as Map<String, dynamic>))
           .toList();
     } catch (e) {
       throw GetHorizontalVideosException(

@@ -6,7 +6,8 @@ import 'package:lush_app/features/horizontal_videos/domain/entities/horizontal_v
 
 abstract interface class HorizontalVideoRepository
     implements Repository<HorizontalVideo, HorizontalVideoModel> {
-  Future<Either<Failure, List<HorizontalVideo>>> getHorizontalVideos();
+  Future<Either<Failure, List<HorizontalVideo>>> getHorizontalVideos(
+      {String? lastVideoId});
   Future<Either<Failure, HorizontalVideo>> getHorizontalVideoById(String id);
 
   Future<Either<Failure, HorizontalVideo>> uploadHorizontalVideos(

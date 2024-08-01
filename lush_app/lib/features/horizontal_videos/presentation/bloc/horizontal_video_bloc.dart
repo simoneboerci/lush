@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lush_app/features/horizontal_videos/domain/entities/horizontal_video.dart';
 import 'package:lush_app/features/horizontal_videos/domain/params/get_horizontal_video_by_id_params.dart';
 import 'package:lush_app/features/horizontal_videos/domain/params/get_horizontal_videos_params.dart';
 import 'package:lush_app/features/horizontal_videos/domain/params/upload_horizontal_video_params.dart';
@@ -13,6 +14,10 @@ class HorizontalVideoBloc
   final GetHorizontalVideosUseCase _getHorizontalVideosUseCase;
   final GetHorizontalVideoByIdUseCase _getHorizontalVideoByIdUseCase;
   final UploadHorizontalVideoUseCase _uploadHorizontalVideoUseCase;
+
+  final List<HorizontalVideo> _allVideos = [];
+  String? _lastVideoId;
+  bool _hasReachedEnd = false;
 
   HorizontalVideoBloc({
     required GetHorizontalVideosUseCase getHorizontalVideosUseCase,
@@ -29,15 +34,26 @@ class HorizontalVideoBloc
 
   Future<void> _onGetHorizontalVideos(GetHorizontalVideosEvent event,
       Emitter<HorizontalVideoState> emit) async {
-    emit(const HorizontalVideosLoadingState());
+    if (_hasReachedEnd) return;
 
-    final response =
-        await _getHorizontalVideosUseCase(const GetHorizontalVideosParams());
+    if (_allVideos.isEmpty) {
+      emit(const HorizontalVideosLoadingState());
+    } else {
+      emit(HorizontalVideosLoadingMoreState(_allVideos));
+    }
 
-    response.fold(
-        (failure) => emit(HorizontalVideoErrorState(failure.message)),
-        (horizontalVideos) =>
-            emit(HorizontalVideosLoadedState(horizontalVideos)));
+    final response = await _getHorizontalVideosUseCase(
+        GetHorizontalVideosParams(lastVideoId: _lastVideoId));
+
+    response.fold((failure) {
+      emit(HorizontalVideoErrorState(failure.message));
+    }, (newVideos) {
+      _allVideos.addAll(newVideos);
+      _lastVideoId = newVideos.isNotEmpty ? newVideos.last.id : null;
+      _hasReachedEnd =
+          newVideos.length < 10; // Assuming page size is a predefined variable
+      emit(HorizontalVideosLoadedState(_allVideos));
+    });
   }
 
   Future<void> _onGetHorizontalVideoById(GetHorizontalVideoByIdEvent event,

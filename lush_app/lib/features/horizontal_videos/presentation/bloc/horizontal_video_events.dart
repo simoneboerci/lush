@@ -8,7 +8,11 @@ abstract interface class HorizontalVideoEvent extends Equatable {
 }
 
 final class GetHorizontalVideosEvent extends HorizontalVideoEvent {
-  const GetHorizontalVideosEvent();
+  final String? lastVideoId;
+  const GetHorizontalVideosEvent({this.lastVideoId});
+
+  @override
+  List<Object?> get props => [lastVideoId];
 }
 
 final class GetHorizontalVideoByIdEvent extends HorizontalVideoEvent {
