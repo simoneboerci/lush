@@ -13,5 +13,6 @@ abstract interface class HorizontalVideoDataSource {
     String filePath,
     String fileName,
     String thumbnailUrl,
+    String title,
   );
 }

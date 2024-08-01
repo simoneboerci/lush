@@ -24,11 +24,13 @@ final class UploadHorizontalVideoEvent extends HorizontalVideoEvent {
   final String filePath;
   final String fileName;
   final String thumbnailUrl;
+  final String title;
 
   const UploadHorizontalVideoEvent({
     required this.filePath,
     required this.fileName,
     required this.thumbnailUrl,
+    required this.title,
   });
 
   @override

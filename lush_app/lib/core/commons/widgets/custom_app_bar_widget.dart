@@ -5,25 +5,30 @@ import 'package:lush_app/core/commons/widgets/lush_token_count_widget.dart';
 class CustomAppBarWidget extends StatelessWidget {
   final String title;
   final bool showTokensCount;
+  final EdgeInsets padding;
 
   const CustomAppBarWidget({
     super.key,
     required this.title,
     this.showTokensCount = false,
+    this.padding = const EdgeInsets.only(bottom: 30.0),
   });
 
   @override
   Widget build(BuildContext context) {
-    return showTokensCount
-        ? Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              _buildTitleText(),
-              const LushTokenCountWidget(),
-            ],
-          )
-        : _buildTitleText();
+    return Padding(
+      padding: padding,
+      child: showTokensCount
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _buildTitleText(),
+                const LushTokenCountWidget(),
+              ],
+            )
+          : _buildTitleText(),
+    );
   }
 
   Widget _buildTitleText() {

@@ -176,8 +176,8 @@ class _HorizontalVideoListItemWidgetState
                 color: Colors.black26,
                 borderRadius: BorderRadius.circular(8.0),
               ),
-              child: const CustomText(
-                text: 'Hi, look at my boobs',
+              child: CustomText(
+                text: widget.video.title,
                 fontWeight: FontWeight.bold,
               ),
             ),

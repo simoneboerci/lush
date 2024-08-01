@@ -16,6 +16,7 @@ class HorizontalVideoRepositoryImpl implements HorizontalVideoRepository {
       id: model.id,
       url: model.url,
       thumbnaillUrl: model.thumbnailUrl,
+      title: model.title,
     );
   }
 
@@ -25,6 +26,7 @@ class HorizontalVideoRepositoryImpl implements HorizontalVideoRepository {
       id: entity.id,
       url: entity.url,
       thumbnailUrl: entity.thumbnaillUrl,
+      title: entity.title,
     );
   }
 
@@ -56,10 +58,11 @@ class HorizontalVideoRepositoryImpl implements HorizontalVideoRepository {
     String filePath,
     String fileName,
     String thumbnailUrl,
+    String title,
   ) async {
     try {
       final videoModel = await horizontalVideoDataSource.uploadHorizontalVideo(
-          filePath, fileName, thumbnailUrl);
+          filePath, fileName, thumbnailUrl, title);
       return right(toEntity(videoModel));
     } catch (e) {
       return left(Failure(message: e.toString()));

@@ -13,5 +13,6 @@ abstract interface class HorizontalVideoRepository
     String filePath,
     String fileName,
     String thumbnailUrl,
+    String title,
   );
 }

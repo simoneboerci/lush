@@ -15,6 +15,6 @@ class UploadHorizontalVideoUseCase
   Future<Either<Failure, HorizontalVideo>> call(
       UploadHorizontalVideoParams params) async {
     return await horizontalVideoRepository.uploadHorizontalVideos(
-        params.filePath, params.fileName, params.thumbnailUrl);
+        params.filePath, params.fileName, params.thumbnailUrl, params.title);
   }
 }

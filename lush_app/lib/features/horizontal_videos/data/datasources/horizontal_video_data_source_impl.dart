@@ -74,6 +74,7 @@ class HorizontalVideoDataSourceImpl implements HorizontalVideoDataSource {
     String filePath,
     String fileName,
     String thumbnailUrl,
+    String title,
   ) async {
     try {
       final downloadUrl = await _uploadFileAndGetDownloadUrl(
@@ -83,6 +84,7 @@ class HorizontalVideoDataSourceImpl implements HorizontalVideoDataSource {
         id: fileName,
         url: downloadUrl,
         thumbnailUrl: thumbnailUrl,
+        title: title,
       );
 
       await _firestore

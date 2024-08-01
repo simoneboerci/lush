@@ -60,6 +60,7 @@ class HorizontalVideoBloc
       filePath: event.filePath,
       fileName: event.fileName,
       thumbnailUrl: event.thumbnailUrl,
+      title: event.title,
     ));
 
     response.fold(
