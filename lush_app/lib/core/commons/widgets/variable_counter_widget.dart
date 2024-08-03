@@ -18,9 +18,9 @@ class VariableCounterWidget extends StatelessWidget {
     this.mainAxisAlignment = MainAxisAlignment.center,
     required this.variableText,
     this.variableTextFontWeight = FontWeight.bold,
-    this.variableTextFontSize = 18.0,
+    this.variableTextFontSize = 16.0,
     required this.label,
-    this.labelFontSize = 18.0,
+    this.labelFontSize = 16.0,
   });
 
   @override
@@ -28,7 +28,7 @@ class VariableCounterWidget extends StatelessWidget {
     return Padding(
       padding: padding,
       child: SizedBox(
-        width: 100.0,
+        width: maxWidth,
         child: Column(
           mainAxisAlignment: mainAxisAlignment,
           children: [

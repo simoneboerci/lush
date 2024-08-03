@@ -6,6 +6,7 @@ import 'package:lush_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:lush_app/features/auth/presentation/pages/login_screen.dart';
 import 'package:lush_app/features/collections/presentation/bloc/collection_bloc.dart';
 import 'package:lush_app/features/collections/presentation/pages/collection_screen.dart';
+import 'package:lush_app/features/my_profile/presentation/pages/profile_screen.dart';
 import 'package:lush_app/init_dependencies.dart';
 
 void main() async {
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         theme: ThemeData(fontFamily: 'Montserrat'),
         title: 'Lush',
-        home: CollectionScreen(
+        home: ProfileScreen(
             /*BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
             if (state is AuthErrorState) {
