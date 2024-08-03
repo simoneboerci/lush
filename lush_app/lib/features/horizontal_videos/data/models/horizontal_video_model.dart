@@ -11,7 +11,7 @@ enum HorizontalVideoModelField {
 
 @immutable
 class HorizontalVideoModel extends Equatable
-    implements Model<HorizontalVideoModel> {
+    implements BaseModel<HorizontalVideoModel> {
   final String id;
   final String url;
   final String thumbnailUrl;
