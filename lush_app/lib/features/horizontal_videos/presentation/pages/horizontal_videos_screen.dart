@@ -3,11 +3,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lush_app/core/commons/widgets/custom_app_bar_widget.dart';
 import 'package:lush_app/core/commons/widgets/custom_background.dart';
 import 'package:lush_app/core/commons/widgets/custom_loader.dart';
+import 'package:lush_app/core/constants/routes.dart';
 import 'package:lush_app/core/utils/show_snackbar.dart';
+import 'package:lush_app/features/horizontal_videos/domain/entities/horizontal_video.dart';
 import 'package:lush_app/features/horizontal_videos/presentation/bloc/horizontal_video_bloc.dart';
 import 'package:lush_app/features/horizontal_videos/presentation/bloc/horizontal_video_events.dart';
 import 'package:lush_app/features/horizontal_videos/presentation/bloc/horizontal_video_states.dart';
-import 'package:lush_app/features/horizontal_videos/presentation/widgets/horizontal_video_list_item_widget.dart';
+import 'package:lush_app/features/horizontal_videos/presentation/viewmodels/flexible_video_player_view_model.dart';
+import 'package:lush_app/features/horizontal_videos/presentation/widgets/flexible_video_player.dart';
+import 'package:lush_app/features/horizontal_videos/presentation/widgets/video_cards/title_video_card_widget.dart';
+import 'package:lush_app/features/horizontal_videos/presentation/widgets/video_controls/minimal_video_controls_widget.dart';
 
 class HorizontalVideosScreen extends StatefulWidget {
   const HorizontalVideosScreen({super.key});
@@ -18,17 +23,18 @@ class HorizontalVideosScreen extends StatefulWidget {
 
 class HorizontalVideosScreenState extends State<HorizontalVideosScreen> {
   final ScrollController _scrollController = ScrollController();
+  final Map<String, FlexibleVideoPlayerViewModel> _videoViewModels = {};
 
   @override
   void initState() {
     context.read<HorizontalVideoBloc>().add(const GetHorizontalVideosEvent());
-    _scrollController.addListener(_onScroll);
     super.initState();
+    _scrollController.addListener(_onScroll);
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
       context.read<HorizontalVideoBloc>().add(const GetHorizontalVideosEvent());
     }
   }
@@ -59,17 +65,22 @@ class HorizontalVideosScreenState extends State<HorizontalVideosScreen> {
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 30.0),
                     child: ListView.builder(
-                        controller: _scrollController,
-                        itemCount: videos.length +
-                            (state is HorizontalVideosLoadingMoreState ? 1 : 0),
-                        itemBuilder: (context, index) {
-                          if (index == videos.length) {
-                            return const CustomLoader();
-                          }
-                          return HorizontalVideoListItemWidget(
-                            video: videos[index],
-                          );
-                        }),
+                      controller: _scrollController,
+                      itemCount: videos.length +
+                          (state is HorizontalVideosLoadingMoreState ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index == videos.length) {
+                          return const CustomLoader();
+                        }
+
+                        final currentVideo = videos[index];
+                        final viewModel = _videoViewModels.putIfAbsent(
+                            currentVideo.id,
+                            () => _createVideoPlayerViewModel(currentVideo));
+
+                        return FlexibleVideoPlayer(videwModel: viewModel);
+                      },
+                    ),
                   );
                 }
                 return const Center(child: Text('Unknown error occurred'));
@@ -81,9 +92,42 @@ class HorizontalVideosScreenState extends State<HorizontalVideosScreen> {
     );
   }
 
+  FlexibleVideoPlayerViewModel _createVideoPlayerViewModel(
+      HorizontalVideo video) {
+    return FlexibleVideoPlayerViewModel(
+      videoUrl: video.url,
+      thumnailUrl: video.thumbnaillUrl,
+      enablePreview: true,
+      onTap: () {
+        context
+            .read<HorizontalVideoBloc>()
+            .add(GetHorizontalVideoByIdEvent(video.id));
+        Navigator.pushNamed(context, cHorizontalVideoPlayerScreen);
+      },
+      controlsBuilder: (context, viewModel) {
+        return MinimalVideoControlsWidget(
+          controller: viewModel.controller,
+          onPressed: () {
+            context
+                .read<HorizontalVideoBloc>()
+                .add(GetHorizontalVideoByIdEvent(video.id));
+
+            Navigator.pushNamed(context, cHorizontalVideoPlayerScreen);
+          },
+        );
+      },
+      additionalComponents: (_, __) {
+        return TitleVideoCardWidget(title: video.title);
+      },
+    );
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
+    for (final vm in _videoViewModels.values) {
+      vm.dispose();
+    }
     super.dispose();
   }
 }

@@ -12,6 +12,7 @@ class CustomIconButton extends StatelessWidget {
     this.iconMargin,
     this.backgroundColor = Colors.transparent,
     this.borderColor = Colors.transparent,
+    this.iconSize,
   });
 
   const CustomIconButton.large({
@@ -23,6 +24,7 @@ class CustomIconButton extends StatelessWidget {
     this.iconMargin = const EdgeInsets.all(28.0),
     this.backgroundColor = const Color(0xFF333333),
     this.borderColor = cSecondaryColor,
+    this.iconSize,
   });
 
   const CustomIconButton.small({
@@ -34,6 +36,7 @@ class CustomIconButton extends StatelessWidget {
     this.iconMargin,
     this.backgroundColor = Colors.transparent,
     this.borderColor = Colors.transparent,
+    this.iconSize,
   });
 
   final EdgeInsets padding;
@@ -43,12 +46,14 @@ class CustomIconButton extends StatelessWidget {
   final EdgeInsets? iconMargin;
   final Color? backgroundColor;
   final Color borderColor;
+  final double? iconSize;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: padding,
       child: IconButton(
+        iconSize: iconSize,
         style: IconButton.styleFrom(
           side: BorderSide(
             color: borderColor,
