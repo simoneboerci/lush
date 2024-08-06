@@ -14,7 +14,17 @@ class UploadHorizontalVideoUseCase
   @override
   Future<Either<Failure, HorizontalVideo>> call(
       UploadHorizontalVideoParams params) async {
-    return await horizontalVideoRepository.uploadHorizontalVideos(
-        params.filePath, params.fileName, params.thumbnailUrl, params.title);
+    return await horizontalVideoRepository.uploadVideo(
+      userId: params.userId,
+      videoFile: params.videoFile,
+      thumbnailFile: params.thumbnailFile,
+      title: params.title,
+      isLive: params.isLive,
+      isMonetized: params.isMonetized,
+      description: params.description,
+      tags: params.tags,
+      category: params.category,
+      privacy: params.privacy,
+    );
   }
 }

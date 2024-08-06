@@ -42,14 +42,31 @@ import 'package:lush_app/features/collections/domain/repositories/collection_rep
 import 'package:lush_app/features/collections/domain/usecases/get_collection_card_use_case.dart';
 import 'package:lush_app/features/collections/domain/usecases/get_collection_use_case.dart';
 import 'package:lush_app/features/collections/presentation/bloc/collection_bloc.dart';
-import 'package:lush_app/features/horizontal_videos/data/datasources/horizontal_video_data_source.dart';
-import 'package:lush_app/features/horizontal_videos/data/datasources/horizontal_video_data_source_impl.dart';
+import 'package:lush_app/features/horizontal_videos/data/datasources/horizontal_video_remote_data_source.dart';
+import 'package:lush_app/features/horizontal_videos/data/datasources/horizontal_video_remote_data_source_impl.dart';
+import 'package:lush_app/features/horizontal_videos/data/repositories/horizontal_video_advanced_stats_repository_impl.dart';
+import 'package:lush_app/features/horizontal_videos/data/repositories/horizontal_video_details_repository_impl.dart';
+import 'package:lush_app/features/horizontal_videos/data/repositories/horizontal_video_file_info_repository_impl.dart';
+import 'package:lush_app/features/horizontal_videos/data/repositories/horizontal_video_metadata_repository_impl.dart';
 import 'package:lush_app/features/horizontal_videos/data/repositories/horizontal_video_repository_impl.dart';
+import 'package:lush_app/features/horizontal_videos/data/repositories/horizontal_video_state_repository_impl.dart';
+import 'package:lush_app/features/horizontal_videos/data/repositories/horizontal_video_user_info_repository_impl.dart';
+import 'package:lush_app/features/horizontal_videos/data/repositories/horizontal_video_user_interactions_repository_impl.dart';
+import 'package:lush_app/features/horizontal_videos/domain/repositories/horizontal_video_advanced_stats_repository.dart';
+import 'package:lush_app/features/horizontal_videos/domain/repositories/horizontal_video_details_repository.dart';
+import 'package:lush_app/features/horizontal_videos/domain/repositories/horizontal_video_file_info_repository.dart';
+import 'package:lush_app/features/horizontal_videos/domain/repositories/horizontal_video_metadata_repository.dart';
 import 'package:lush_app/features/horizontal_videos/domain/repositories/horizontal_video_repository.dart';
+import 'package:lush_app/features/horizontal_videos/domain/repositories/horizontal_video_state_repository.dart';
+import 'package:lush_app/features/horizontal_videos/domain/repositories/horizontal_video_user_info_repository.dart';
+import 'package:lush_app/features/horizontal_videos/domain/repositories/horizontal_video_user_interactions_repository.dart';
+import 'package:lush_app/features/horizontal_videos/domain/usecases/delete_horizontal_video_use_case.dart';
+import 'package:lush_app/features/horizontal_videos/domain/usecases/fetch_horizontal_videos_use_case.dart';
+import 'package:lush_app/features/horizontal_videos/domain/usecases/get_all_horizontal_videos_use_case.dart';
 import 'package:lush_app/features/horizontal_videos/domain/usecases/get_horizontal_video_by_id_use_case.dart';
-import 'package:lush_app/features/horizontal_videos/domain/usecases/get_horizontal_videos_use_case.dart';
+import 'package:lush_app/features/horizontal_videos/domain/usecases/update_horizontal_video_use_case.dart';
 import 'package:lush_app/features/horizontal_videos/domain/usecases/upload_horizontal_video_use_case.dart';
-import 'package:lush_app/features/horizontal_videos/presentation/bloc/horizontal_video_bloc.dart';
+import 'package:lush_app/features/horizontal_videos/presentation/bloc/horizontal_video_list_bloc.dart';
 import 'package:lush_app/firebase_options.dart';
 
 final serviceLocator = GetIt.instance;
@@ -187,23 +204,54 @@ void _initCollectionDependencies() {
 void _initHorizontalVideoDependencies() {
   // Data sources
   serviceLocator
-    ..registerFactory<HorizontalVideoDataSource>(
-        () => HorizontalVideoDataSourceImpl())
+    ..registerFactory<HorizontalVideoRemoteDataSource>(
+        () => HorizontalVideoRemoteDataSourceImpl())
 
     // Repositories
+    ..registerFactory<HorizontalVideoAdvancedStatsRepository>(
+        () => HorizontalVideoAdvancedStatsRepositoryImpl())
+    ..registerFactory<HorizontalVideoDetailsRepository>(
+        () => HorizontalVideoDetailsRepositoryImpl())
+    ..registerFactory<HorizontalVideoFileInfoRepository>(
+        () => HorizontalVideoFileInfoRepositoryImpl())
+    ..registerFactory<HorizontalVideoStateRepository>(
+        () => HorizontalVideoStateRepositoryImpl())
+    ..registerFactory<HorizontalVideoMetadataRepository>(
+        () => HorizontalVideoMetadataRepositoryImpl())
+    ..registerFactory<HorizontalVideoUserInfoRepository>(
+        () => HorizontalVideoUserInfoRepositoryImpl())
+    ..registerFactory<HorizontalVideoUserInteractionsRepository>(
+        () => HorizontalVideoUserInteractionsRepositoryImpl())
     ..registerFactory<HorizontalVideoRepository>(
-        () => HorizontalVideoRepositoryImpl(serviceLocator()))
+      () => HorizontalVideoRepositoryImpl(
+        userRemoteDataSource: serviceLocator(),
+        horizontalVideoRemoteDataSource: serviceLocator(),
+        horizontalVideoAdvancedStatsRepository: serviceLocator(),
+        horizontalVideoDetailsRepository: serviceLocator(),
+        horizontalVideoFileInfoRepository: serviceLocator(),
+        horizontalVideoStateRepository: serviceLocator(),
+        horizontalVideoMetadataRepository: serviceLocator(),
+        horizontalVideoUserInfoRepository: serviceLocator(),
+        horizontalVideoUserInteractionsRepository: serviceLocator(),
+      ),
+    )
 
     // Usecases
-    ..registerFactory(() => GetHorizontalVideosUseCase(serviceLocator()))
+    ..registerFactory(() => DeleteHorizontalVideoUseCase(serviceLocator()))
+    ..registerFactory(() => FetchHorizontalVideosUseCase(serviceLocator()))
+    ..registerFactory(() => GetAllHorizontalVideosUseCase(serviceLocator()))
     ..registerFactory(() => GetHorizontalVideoByIdUseCase(serviceLocator()))
+    ..registerFactory(() => UpdateHorizontalVideoUseCase(serviceLocator()))
     ..registerFactory(() => UploadHorizontalVideoUseCase(serviceLocator()))
 
     // Bloc
     ..registerLazySingleton(
-      () => HorizontalVideoBloc(
-        getHorizontalVideosUseCase: serviceLocator(),
+      () => HorizontalVideoListBloc(
+        deleteHorizontalVideoUseCase: serviceLocator(),
+        fetchHorizontalVideosUseCase: serviceLocator(),
+        getAllHorizontalVideoUseCase: serviceLocator(),
         getHorizontalVideoByIdUseCase: serviceLocator(),
+        updateHorizontalVideoUseCase: serviceLocator(),
         uploadHorizontalVideoUseCase: serviceLocator(),
       ),
     );

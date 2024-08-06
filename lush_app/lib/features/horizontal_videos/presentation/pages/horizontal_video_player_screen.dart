@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lush_app/core/commons/widgets/custom_app_bar_widget.dart';
 import 'package:lush_app/core/commons/widgets/custom_background.dart';
@@ -8,11 +8,13 @@ import 'package:lush_app/core/utils/show_snackbar.dart';
 import 'package:lush_app/features/horizontal_videos/presentation/bloc/horizontal_video_bloc.dart';
 import 'package:lush_app/features/horizontal_videos/presentation/bloc/horizontal_video_states.dart';
 import 'package:lush_app/features/horizontal_videos/presentation/viewmodels/flexible_video_player_view_model.dart';
+import 'package:lush_app/features/horizontal_videos/presentation/widgets/custom_video_player.dart';
 import 'package:lush_app/features/horizontal_videos/presentation/widgets/flexible_video_player.dart';
 import 'package:lush_app/features/horizontal_videos/presentation/widgets/recommended_videos_widget.dart';
 import 'package:lush_app/features/horizontal_videos/presentation/widgets/video_cards/actions_video_card_widget.dart';
 import 'package:lush_app/features/horizontal_videos/presentation/widgets/video_cards/title_video_card_widget.dart';
 import 'package:lush_app/features/horizontal_videos/presentation/widgets/video_controls/basic_video_controls_widget.dart';
+import 'package:lush_app/features/horizontal_videos/presentation/widgets/video_player_widget.dart';
 
 class HorizontalVideoPlayerScreen extends StatelessWidget {
   const HorizontalVideoPlayerScreen({super.key});
@@ -42,10 +44,10 @@ class HorizontalVideoPlayerScreen extends StatelessWidget {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        FlexibleVideoPlayer(
-                          videwModel: FlexibleVideoPlayerViewModel(
+                        VideoPlayerWidget(
+                          videoPlayer: CustomVideoPlayer(
                             videoUrl: video.url,
-                            thumnailUrl: video.thumbnaillUrl,
+                            thumbnailUrl: video.thumbnaillUrl,
                             autoPlay: true,
                             enablePreview: false,
                             controlsBuilder: (_, viewModel) {
@@ -86,9 +88,9 @@ class HorizontalVideoPlayerScreen extends StatelessWidget {
                             },
                           ),
                         ),
-                        HorizontalRecommendedVideosWidget(
+                        /*HorizontalRecommendedVideosWidget(
                           currentVideo: state.horizontalVideo,
-                        ),
+                        ),*/
                       ],
                     ),
                   ),
@@ -103,3 +105,4 @@ class HorizontalVideoPlayerScreen extends StatelessWidget {
     );
   }
 }
+*/
